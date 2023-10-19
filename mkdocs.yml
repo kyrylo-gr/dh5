@@ -44,7 +44,6 @@ plugins:
       watch: dh5/
 
 nav:
-  - Home: /
   - About: about/
   - Releases: releases/
   # - Tutorials:
@@ -53,6 +52,6 @@ nav:
   # - Developer's Guide:
   #   - Use mathematical expressions: expressions.md
   - Code Reference:
-      - DH5: /dh5/
-      - DataTypes: /types/
-      - For development: /develop/
+      - DH5: dh5
+      - DataTypes: types/
+      - For development: develop/
