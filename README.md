@@ -1,7 +1,7 @@
 # dh5 library
 
 ![Python 3.7+](https://img.shields.io/badge/python-3.7%2B-blue)
-[![License](https://img.shields.io/badge/license-MIT-yellow)](./LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![CodeFactor](https://www.codefactor.io/repository/github/kyrylo-gr/dh5/badge/main)](https://www.codefactor.io/repository/github/kyrylo-gr/dh5/overview/main)
 [![Download Stats](https://img.shields.io/pypi/dm/dh5)](https://pypistats.org/packages/dh5)

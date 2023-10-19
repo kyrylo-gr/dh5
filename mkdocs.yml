@@ -1,4 +1,6 @@
 site_name: Data in H5
+site_url: https://kyrylo-gr.github.io/dh5/
+repo_url: https://github.com/kyrylo-gr/dh5
 theme:
   name: material
   features:
@@ -39,13 +41,6 @@ plugins:
             show_signature_annotations: false
             separate_signature: true
             unwrap_annotated: true
-            # summary:
-            # functions: true
-            # show_root_heading: false
-            # show_root_full_path: false
-            # show_root_toc_entry: false
-            # show_signature_annotations: false
-            # heading_level: 1
       watch: dh5/
 
 nav:
