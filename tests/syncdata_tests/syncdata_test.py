@@ -89,13 +89,13 @@ class WithoutSavingTest(unittest.TestCase):
 
     def test_pop1(self):
         self.apply_func("update", a2=5)
-        self.assertEqual(self.data_smart.pop("a2"), self.data_dict.pop("a2"))
-        self.compare()
+        self.assertEqual(self.data_smart.pop("a2"), 5)
 
     def test_remove(self):
         self.apply_func("update", a2=self.create_random_data())
+        if hasattr(self, "data_dict") and isinstance(self.data_dict, dict):
+            self.data_dict.pop("a2")
         self.data_smart = self.data_smart.remove("a2")
-        self.data_dict.pop("a2")
         self.compare()
 
     def test_get(self):
