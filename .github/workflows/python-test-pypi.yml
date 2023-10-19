@@ -36,9 +36,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install flake8 pytest
-          python -m pip install labmate
+          python -m pip install dh5
 
       - name: Test with pytest
         run: |
-          rm -R labmate
+          rm -R dh5
           pytest .

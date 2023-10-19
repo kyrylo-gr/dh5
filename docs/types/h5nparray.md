@@ -7,7 +7,7 @@ In `H5PY` `np.ndarray` can be saved as soon as modified. To do that there exists
 1. Open file in write mode.
 
 ```python
-from labmate.DH5 import DH5
+from DH5.DH5 import DH5
 sd = DH5('tmp_data/test.h5', overwrite=True, save_on_edit=False)
 ```
 

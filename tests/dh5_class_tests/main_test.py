@@ -429,7 +429,7 @@ class ReadModeTest(unittest.TestCase):
         d["t"] = 3
 
     def test_global_readonly(self):
-        # from labmate.utils.async_utils import sleep
+        # from DH5.utils.async_utils import sleep
         d = DH5(DATA_FILE_PATH, read_only=True)
 
         with self.assertRaises(ValueError):

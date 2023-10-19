@@ -1,4 +1,4 @@
-"""Module contains the errors used inside labmate."""
+"""Module contains the errors used inside DH5."""
 
 
 from typing import Optional, Set, Union
