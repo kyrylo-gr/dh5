@@ -1,4 +1,8 @@
-# dh5 library
+<h1 align="center">
+<img src="docs/images/dh5-logo.png" width="400">
+</h1><br>
+
+<div align="center">
 
 ![Python 3.7+](https://img.shields.io/badge/python-3.7%2B-blue)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
@@ -6,6 +10,21 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/kyrylo-gr/dh5/badge/main)](https://www.codefactor.io/repository/github/kyrylo-gr/dh5/overview/main)
 [![Download Stats](https://img.shields.io/pypi/dm/dh5)](https://pypistats.org/packages/dh5)
 [![Documentation](https://img.shields.io/badge/docs-blue)](https://kyrylo-gr.github.io/dh5/)
+
+</div>
+
+`Dictionary H5` — a package that enables the seamless manipulation of HDF5 files by treating them like traditional dictionaries.
+
+- Concerned about losing your data in case of a kernel crash?
+  `DH5` has a save_on_edit method to ensure your data is **always saved**.
+
+- Need to update a single element in an array without a full re-save?
+  No problem – `DH5` **only updates the changes** you make.
+
+- Want to save tricky data like strings, mixed object arrays, or even functions, which can be challenging with `h5py`?
+  `DH5` simplifies the process of **saving a wide variety of object types**.
+
+Give `dh5` a try and streamline your data management.
 
 ## Install
 
