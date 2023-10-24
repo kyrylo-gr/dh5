@@ -1,13 +1,27 @@
-site_name: Data in H5
+site_name: DH5
 site_url: https://kyrylo-gr.github.io/dh5/
 repo_url: https://github.com/kyrylo-gr/dh5
 theme:
   name: material
+  logo: images/dh5-logo-small.png
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
   features:
     - navigation.instant
     - navigation.sections
     - search.suggest
     - search.highlight
+extra_css:
+  - stylesheets/extra.css
 
 plugins:
   - search
@@ -36,7 +50,7 @@ plugins:
             show_symbol_type_toc: true
             docstring_style: google
             docstring_section_style: table
-            members_order: source
+            # members_order: source
             show_signature: true
             show_signature_annotations: false
             separate_signature: true
@@ -48,11 +62,6 @@ nav:
       - Installation: starting_guide/install
       - First steps: starting_guide/first_steps
       - Advanced examples: starting_guide/advanced_examples
-  # - Tutorials:
-  #   - Examples: examples.md
-  #   - Create and use variables: variables.md
-  # - Developer's Guide:
-  #   - Use mathematical expressions: expressions.md
   - User Guide:
       - DH5 class: dh5
       - DataTypes: types/

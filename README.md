@@ -37,20 +37,24 @@ Give `dh5` a try and streamline your data management.
 ## Usage
 
 ```python
+# Save {'a': 5} to `somedata.h5`
 >>> sd = DH5('somedata.h5', 'w')
 >>> sd['a'] = 5
 >>> sd.save()
 
+# Open 'somedata.h5' in read mode
 >>> sd_read = DH5('somedata.h5', 'r')
->>> sd_read['a']
+>>> sd_read['a'] # access data as an item
 5
->>> sd_read.a
+>>> sd_read.a # access data as an attribute
 5
 
+# Open 'somedata.h5' in append mode. Allows to add data to existing file.
 >>> sd_append = DH5('somedata.h5', 'a')
 >>> sd_append['b'] = 6
 >>> sd_append.save()
 
+# In the end, `samedata.h5` contains {'a': 5, 'b': 6}
 >>> sd_read = DH5('somedata.h5', 'r')
 >>> sd_read['a'], sd_read['b']
 (5, 6)

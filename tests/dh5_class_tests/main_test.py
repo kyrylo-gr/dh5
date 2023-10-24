@@ -964,26 +964,72 @@ class ModesDuringInitTest(unittest.TestCase):
         self.assertFalse(sd1.__similar__(sd2))
 
     def test_write_mode(self):
-        sd1 = DH5(DATA_FILE_PATH, save_on_edit=False, overwrite=True, read_only=False)
+        sd1 = DH5(DATA_FILE_PATH, save_on_edit=False, overwrite=False, read_only=False)
+        os.remove(DATA_FILE_PATH)
         sd2 = DH5(DATA_FILE_PATH, mode="w")
         self.assertTrue(sd1.__similar__(sd2))
 
     def test_write_mode_wrong(self):
         """Overwrite parameter could be difficult to test, so this test checks that it's detected."""
-        sd1 = DH5(DATA_FILE_PATH, save_on_edit=False, overwrite=False, read_only=False)
+        sd1 = DH5(DATA_FILE_PATH, save_on_edit=False, overwrite=True, read_only=False)
+        os.remove(DATA_FILE_PATH)
         sd2 = DH5(DATA_FILE_PATH, mode="w")
         self.assertFalse(sd1.__similar__(sd2))
 
     def test_write_equal_mode(self):
-        sd1 = DH5(DATA_FILE_PATH, save_on_edit=True, overwrite=True, read_only=False)
+        sd1 = DH5(DATA_FILE_PATH, save_on_edit=True, overwrite=False, read_only=False)
+        os.remove(DATA_FILE_PATH)
         sd2 = DH5(DATA_FILE_PATH, mode="w=")
         self.assertTrue(sd1.__similar__(sd2))
 
     def test_write_equal_mode_wrong(self):
         """Overwrite parameter could be difficult to test, so this test checks that it's detected."""
-        sd1 = DH5(DATA_FILE_PATH, save_on_edit=True, overwrite=False, read_only=False)
+        sd1 = DH5(DATA_FILE_PATH, save_on_edit=True, overwrite=True, read_only=False)
+        os.remove(DATA_FILE_PATH)
         sd2 = DH5(DATA_FILE_PATH, mode="w=")
         self.assertFalse(sd1.__similar__(sd2))
+
+    def test_overwrite_mode(self):
+        sd1 = DH5(DATA_FILE_PATH, save_on_edit=False, overwrite=True, read_only=False)
+        sd2 = DH5(DATA_FILE_PATH, mode="w", overwrite=True)
+        self.assertTrue(sd1.__similar__(sd2))
+
+        sd2 = DH5.open_overwrite(DATA_FILE_PATH)
+        self.assertTrue(sd1.__similar__(sd2))
+
+    def test_overwrite_mode_wrong(self):
+        """Overwrite parameter could be difficult to test, so this test checks that it's detected."""
+        sd1 = DH5(DATA_FILE_PATH, save_on_edit=False, overwrite=False, read_only=False)
+        sd2 = DH5(DATA_FILE_PATH, mode="w", overwrite=True)
+        self.assertFalse(sd1.__similar__(sd2))
+
+        sd2 = DH5.open_overwrite(DATA_FILE_PATH)
+        self.assertFalse(sd1.__similar__(sd2))
+
+    def test_overwrite_equal_mode(self):
+        sd1 = DH5(DATA_FILE_PATH, save_on_edit=True, overwrite=True, read_only=False)
+        sd2 = DH5(DATA_FILE_PATH, mode="w=", overwrite=True)
+        self.assertTrue(sd1.__similar__(sd2))
+
+        sd2 = DH5.open_overwrite(DATA_FILE_PATH, mode="=")
+        self.assertTrue(sd1.__similar__(sd2))
+
+        sd2 = DH5.open_overwrite(DATA_FILE_PATH, save_on_edit=True)
+        self.assertTrue(sd1.__similar__(sd2))
+
+    def test_overwrite_equal_mode_wrong(self):
+        """Overwrite parameter could be difficult to test, so this test checks that it's detected."""
+        sd1 = DH5(DATA_FILE_PATH, save_on_edit=True, overwrite=False, read_only=False)
+        sd2 = DH5(DATA_FILE_PATH, mode="w=", overwrite=True)
+        self.assertFalse(sd1.__similar__(sd2))
+
+        sd2 = DH5.open_overwrite(DATA_FILE_PATH, mode="=")
+        self.assertFalse(sd1.__similar__(sd2))
+
+    def test_not_overwriting_in_write_mode(self):
+        _ = DH5(DATA_FILE_PATH, overwrite=True, read_only=False)
+        with self.assertRaises(ValueError):
+            _ = DH5(DATA_FILE_PATH, mode="w")
 
     @classmethod
     def tearDownClass(cls):

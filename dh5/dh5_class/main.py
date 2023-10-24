@@ -49,22 +49,8 @@ class DH5:
     - 'w' - Write mode. If file exists it will be overwritten. And you have full control on data.
     - 'a' - Append mode. If file exists it will be opened. And you have full control on data.
 
-    # Main concepts
+    To overwrite file use `open_overwrite` method or `mode="w"` with `overwrite=True`.
 
-    ## Saving on edit
-    Data can be saved on
-
-    ## Lock data
-
-
-
-    This object is obtained by loading a dataset contained in a .h5 file.
-    Datasets can be obtained as in a dictionary: e.g.
-    data[freqs]
-
-    This class should not contain any not local attributes.
-    Look in __setattr__() to see why it would not work.
-    DH5.get("param")
 
     # Examples
         >>> sd = DH5('somedata.h5', 'w')
@@ -85,10 +71,6 @@ class DH5:
         >>> sd_read['a'], sd_read['b']
         (5, 6)
 
-    ```
-    def abc():
-        return 1
-    ```
     """
 
     _repr: Optional[str] = None
@@ -137,7 +119,6 @@ class DH5:
         if mode is not None:
             if mode.startswith("w"):
                 read_only = False
-                overwrite = True
             elif mode.startswith("a"):
                 read_only = False
                 overwrite = False
@@ -222,7 +203,7 @@ class DH5:
         filepath: Optional[Union[str, Path]] = None,
         save_on_edit: bool = False,
         read_only: Optional[Union[bool, Set[str]]] = None,
-        overwrite: Optional[bool] = None,
+        overwrite: Optional[bool] = True,
         data: Optional[dict] = None,
         open_on_init: Optional[bool] = None,
         **kwds,
@@ -369,7 +350,7 @@ class DH5:
     def update(self: _SELF, __m: Optional[dict] = None, **kwds: "DICT_OR_LIST_LIKE") -> _SELF:
         """Update data from a dictionary or keyword arguments.
 
-        See [`DH5.data_transformation`](data_transformation.md) to learn more
+        See `DH5.data_transformation` to learn more
             about how the types are converted.
 
         Args:
