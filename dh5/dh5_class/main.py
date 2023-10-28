@@ -383,7 +383,9 @@ class DH5:
 
     def _update(self, __m: Optional[dict] = None, **kwds: Any):
         """Update only internal data and attributes.
-        Can be modified in read_only mode. Did not change a file."""
+
+        Can be modified in read_only mode. Did not change a file.
+        """
         if __m is not None:
             kwds.update(__m)
 

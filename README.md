@@ -4,10 +4,12 @@
 
 <div align="center">
 
+[![Pypi](https://img.shields.io/pypi/v/dh5.svg)](https://pypi.org/project/dh5/)
 ![Python 3.7+](https://img.shields.io/badge/python-3.7%2B-blue)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![CodeFactor](https://www.codefactor.io/repository/github/kyrylo-gr/dh5/badge/main)](https://www.codefactor.io/repository/github/kyrylo-gr/dh5/overview/main)
+[![Coverage Status](https://coveralls.io/repos/github/kyrylo-gr/dh5/badge.svg?branch=main)](https://coveralls.io/github/kyrylo-gr/dh5?branch=main)
 [![Download Stats](https://img.shields.io/pypi/dm/dh5)](https://pypistats.org/packages/dh5)
 [![Documentation](https://img.shields.io/badge/docs-blue)](https://kyrylo-gr.github.io/dh5/)
 

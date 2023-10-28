@@ -1,4 +1,4 @@
-# Dictionary H5
+# DH5. Dictionary H5
 
 The `Dictionary H5` provides an intuitive interface for manipulating HDF5 files, allowing them to be handled like traditional Python dictionaries.
 
