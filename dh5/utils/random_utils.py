@@ -1,10 +1,16 @@
+"""Random utilities for the dh5 package."""
 from typing import Optional, Tuple, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pathlib import Path
+    from pathlib import Path  # pragma: no cover
 
 
 def get_timestamp() -> str:
+    """Get the current timestamp in the format 'YYYY_MM_DD__HH_MM_SS'.
+
+    Returns:
+        str: The current timestamp.
+    """
     import datetime
 
     x = datetime.datetime.now()
@@ -14,9 +20,14 @@ def get_timestamp() -> str:
 def lstrip_int(line: str) -> Optional[Tuple[str, str, str]]:
     """Find whether timestamp ends.
     Returns timestamp and rest of the line, if possible.
-    """
-    # this algorithm with regex is 2x faster than the easiest one
 
+    Args:
+        line (str): The line to check for a timestamp.
+
+    Returns:
+        Optional[Tuple[str, str, str]]: A tuple containing the prefix, main part, and suffix
+            of the line if a timestamp is found, None otherwise.
+    """
     import re
 
     main = re.search("_[A-Za-z]", line)
@@ -36,7 +47,7 @@ def lstrip_int(line: str) -> Optional[Tuple[str, str, str]]:
     if not prefix.replace("_", "").replace("-", "").isdigit():
         return None
 
-    return prefix, main, suffix
+    return prefix.strip("_"), main, suffix
 
 
 def get_path_from_filename(filename: Union[str, "Path"]) -> Union[str, tuple]:
@@ -68,17 +79,3 @@ def get_path_from_filename(filename: Union[str, "Path"]) -> Union[str, tuple]:
         suffix = name_with_prefix[1]
         return (suffix, filename)
     return filename
-
-
-def get_var_name_from_def():
-    import traceback
-
-    line = traceback.extract_stack()[-3].line
-    if line and "=" in line:
-        return line.split("=")[0].strip()
-    return None
-
-
-def get_var_name_from_glob(variable):
-    globals_dict = globals()
-    return [var_name for var_name in globals_dict if globals_dict[var_name] is variable]

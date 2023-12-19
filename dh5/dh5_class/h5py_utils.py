@@ -1,3 +1,5 @@
+"""Utils to save and load h5 files."""
+
 from typing import Literal, Optional, Set, Union
 import os
 import h5py
@@ -9,18 +11,39 @@ from .data_transformation import transform_not_dict_on_save, transform_on_open
 
 
 class LockFile:
-    """Context manager that create lock file during writing to prevent conflicts."""
+    """Context manager that creates a lock file during writing to prevent conflicts.
+
+    Usage:
+        To use the LockFile context manager, simply wrap your code that writes to a file with it.
+        This will ensure that only one process can write to the file at a time.
+
+        Example:
+        ```
+        with LockFile("data.txt"):
+             # Code that writes to the file
+             with open("data.txt", "w") as f:
+                 pass
+        ```
+
+    """
 
     def __init__(self, filename):
+        """Initialize the LockFile object.
+
+        Args:
+            filename (str): The filename or filepath. Can end with an extension.
+        """
         self.lock_filename = os.path.splitext(filename)[0] + ".lock"
 
     def __enter__(self):
+        """Enter the context and create the lock file."""
         if os.path.exists(self.lock_filename):
             raise FileLockedError("File locked and cannot be opened in write mode")
         with open(self.lock_filename, "w", encoding="utf-8"):
             pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """Exit the context and remove the lock file."""
         if os.path.exists(self.lock_filename):
             os.remove(self.lock_filename)
 
@@ -135,6 +158,14 @@ def save_dict(
 
     Returns:
         float: Time of the last modification of the file.
+
+    Example:
+        ```
+        save_dict('/path/to/file.h5', {'key1': 1})
+        ```
+
+
+
     """
     dirname = os.path.dirname(filename)
     if dirname and not os.path.exists(dirname):
@@ -155,16 +186,24 @@ def save_dict(
 # -------------- Load keys ----------------
 
 
+# /doc add example to this doc
 def keys_h5(filename, key_prefix: Optional[str] = None) -> Set[str]:
-    """Return keys of h5 file.
+    """
+    Return the keys of an h5 file.
 
     Args:
-        filename (_type_): Full filepath to the file.
-        key_prefix (str, optional): Key prefix to look at. If nested use `key1/key2`.
-         Defaults to None.
+        filename (str): Full filepath to the h5 file.
+        key_prefix (str, optional): Key prefix to look at. If nested, use `key1/key2`.
+            Defaults to None.
 
     Returns:
-        Set[str]: Set of the keys.
+        Set[str]: Set of the keys in the h5 file.
+
+    Example:
+        ```
+        >>> keys_h5('/path/to/file.h5', 'group1')
+        {'key1', 'key2', 'key3'}
+        ```
     """
     with h5py.File(filename, "r") as file:
         if key_prefix is not None:
@@ -180,15 +219,22 @@ def del_dict(
     key: str,
     key_prefix: Optional[str] = None,
 ) -> float:
-    """Delete key from h5 file.
+    """
+    Delete a key from an h5 file.
 
     Args:
         filename (str): Full filepath to the file.
-        key (str): key to delete. If nested use `key1/key2`.
-        key_prefix (str, optional): If provided, key_prefix/key is used. Defaults to None.
+        key (str): The key to delete. If nested, use `key1/key2`.
+        key_prefix (str, optional): If provided, the key prefix to use. Defaults to None.
 
     Returns:
-        float: Time of the last modification of the file.
+        float: The time of the last modification of the file.
+
+    Example:
+        ```
+        >>> del_dict('/path/to/file.h5', 'key1', 'prefix')
+        "some_value"
+        ```
     """
     with LockFile(filename), h5py.File(filename, "a") as file:
         key = key if key_prefix is None else f"{key_prefix}/{key}"

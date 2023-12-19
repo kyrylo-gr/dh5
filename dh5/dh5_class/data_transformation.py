@@ -1,3 +1,4 @@
+"""Data transformation utils."""
 import json
 from typing import Iterable, Optional, Sized
 
@@ -24,7 +25,7 @@ def np_array_check(lst, size: Optional[int] = None) -> int:
     if isinstance(lst, Iterable) and isinstance(lst, Sized) and not isinstance(lst, str):
         # if isinstance(lst, (list, np.ndarray)):
         if size is not None and size != len(lst):
-            return -1
+            return -1  # pragma: no cover
         for lst_elm in lst:
             check = np_array_check(lst_elm, size)
             if check >= 0:
@@ -92,7 +93,9 @@ def transform_not_dict_on_save(value, level=0):
 
     if isinstance(value, (list)) and (np_array_check(value) < 0):
         try:
-            return "__json__" + json.dumps(value)
+            if level == 0:
+                return "__json__" + json.dumps(value)
+            return value
         except TypeError:
             value_transformed = [transform_not_dict_on_save(v, level=level + 1) for v in value]
             return "__json__" + json.dumps(value_transformed)

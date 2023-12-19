@@ -16,6 +16,7 @@ theme:
         icon: material/weather-night
         name: Switch to light mode
   features:
+    - content.code.copy
     - navigation.instant
     - navigation.sections
     - search.suggest
@@ -32,7 +33,7 @@ plugins:
         python:
           options:
             docstring_options:
-              returns_type_in_property_summary: true
+              returns_type_in_property_summary: false
             inherited_members: true
             filters:
               - '!^_' # exclude all members starting with _
@@ -68,3 +69,8 @@ nav:
   - Developer Guide: develop/
   - Releases: releases/
   - About: about/
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences

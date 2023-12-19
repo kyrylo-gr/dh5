@@ -8,6 +8,19 @@ import numpy as np
 
 
 def output_dict_structure(data: dict, additional_info: Optional[Dict[str, str]] = None) -> str:
+    """
+    Convert a dictionary into a JSON-like string representation of its structure.
+
+    Args:
+        data (dict): The input dictionary.
+        additional_info (Optional[Dict[str, str]]): Additional information to be added to the string representation.
+            Each key-value pair in the additional_info dictionary will be appended to the corresponding key in the
+            string representation. The key will be enclosed in double quotes and the value will be appended without
+            quotes.
+
+    Returns:
+        str: The JSON-like string representation of the dictionary structure.
+    """
     dict_str = dict_to_json_format_str(get_dict_structure(data))
     if additional_info:
         for key, value in additional_info.items():
@@ -16,11 +29,30 @@ def output_dict_structure(data: dict, additional_info: Optional[Dict[str, str]] 
 
 
 def dict_to_json_format_str(data: dict) -> str:
-    """Output a dictionary structure."""
+    """
+    Convert a dictionary to a JSON formatted string.
+
+    Args:
+        data (dict): The dictionary to be converted.
+
+    Returns:
+        str: The JSON formatted string representation of the dictionary.
+    """
     return json.dumps(data, sort_keys=True, indent=4)
 
 
 def get_dict_structure(data: dict, level: int = 3) -> dict:
+    """
+    Recursively analyzes the structure of a dictionary.
+    Returns a dictionary containing information about the types and shapes of the values.
+
+    Args:
+        data (dict): The dictionary to analyze.
+        level (int, optional): The maximum depth to analyze the dictionary. Defaults to 3.
+
+    Returns:
+        dict: A dictionary containing information about the structure of the input dictionary.
+    """
     structure = {}
 
     for k, v in data.items():
@@ -48,6 +80,16 @@ def get_dict_structure(data: dict, level: int = 3) -> dict:
 
 
 def get_keys_structure(data) -> dict:
+    """
+    Recursively traverses a dictionary and returns its structure with keys and None values.
+
+    Args:
+        data (dict): The dictionary to analyze.
+
+    Returns:
+        dict: A dictionary representing the structure of the input dictionary, with keys and None values.
+
+    """
     structure = {}
     for k, v in data.items():
         if isinstance(v, dict):

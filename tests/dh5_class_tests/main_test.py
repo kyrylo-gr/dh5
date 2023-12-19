@@ -626,6 +626,24 @@ class SavingOnEditDifferentFormatTest(unittest.TestCase):
         self.assertEqual(d["t", "a"], 5)
         self.assertEqual(d["t", "b"], 4)
 
+    def test_save_underscore_asdict_class(self):
+        from typing import NamedTuple
+
+        class Test(NamedTuple):
+            a: int = 5
+            b: int = 4
+
+        d = self.create_file()
+        d["t"] = Test()
+
+        self.assertEqual(d["t"]["a"], 5)
+        self.assertEqual(d["t"]["b"], 4)
+
+        d = self.read_file(d)
+
+        self.assertEqual(d["t", "a"], 5)
+        self.assertEqual(d["t", "b"], 4)
+
     def test_save_asarray(self):
         class Test:
             def asarray(self):
@@ -682,6 +700,19 @@ class SavingOnEditDifferentFormatTest(unittest.TestCase):
         d = self.read_file(d)
 
         self.assertTrue(d["t"] == lst)
+
+    def test_save_json_nested_np_list(self):
+        d = self.create_file()
+        lst = ["a", "b", [1, 2, 3], np.array([4, 5, 6])]
+        d["t"] = lst
+
+        for elm1, elm2 in zip(d["t"], lst):
+            self.assertTrue(np.all(elm1 == elm2), msg=f"{elm1} != {elm2}")
+
+        d = self.read_file(d)
+
+        for elm1, elm2 in zip(d["t"], lst):
+            self.assertTrue(np.all(elm1 == elm2), msg=f"{elm1} != {elm2}")
 
     def test_save_func(self):
         def abc(a, b=2):

@@ -40,7 +40,7 @@ _SELF = TypeVar("_SELF", bound="DH5")
 
 
 class DH5:
-    """Dict that is synchronized with .h5 file.
+    """DH5 - Dict that is synchronized with .h5 file.
 
     # Usage and initialization
     DH5 can open files in 3 different modes:
@@ -719,7 +719,8 @@ class DH5:
     def __similar__(self, other: "DH5") -> bool:
         """Check if 2 DH5 are similar.
 
-        It means: same file, mode, save_on_edit. Does not check the data."""
+        It means: same file, mode, save_on_edit. Does not check the data.
+        """
         return (
             self._filepath == other._filepath  # pylint: disable=protected-access
             and self._read_only == other._read_only  # pylint: disable=protected-access
@@ -740,6 +741,27 @@ class DH5:
         filepath: Optional[str] = None,
         force: Optional[bool] = None,
     ):
+        """
+        Save the data to a file.
+
+        Args:
+            only_update (Union[bool, Iterable[str]], optional): Determines whether to save only
+                the updated data or all data.
+                If True, only the updated data will be saved. If False, all data will be saved.
+                If an iterable of strings is provided, only the specified keys will be saved. Defaults to True.
+            filepath (str, optional): The path to the file where the data will be saved.
+                If not provided, the default filepath will be used. Defaults to None.
+            force (bool, optional): Determines whether to force the save operation, even if only_update is True.
+                If True, the save operation will be forced. If False or None, the save operation
+                will be performed according to the value of only_update. Defaults to None.
+
+        Returns:
+            self
+
+        Raises:
+            ValueError: If the file is opened in read-only mode, it cannot be saved.
+                The file should be reopened in write mode before saving.
+        """
         if self._read_only is True:
             raise ValueError("Cannot save opened in a read-only mode. Should reopen the file")
 
@@ -831,6 +853,11 @@ class DH5:
 
     @property
     def filepath(self):
+        """
+        Return the filepath without the '.h5' extension.
+
+        If the filepath is None, returns None.
+        """
         return None if self._filepath is None else (self._filepath.rsplit(".h5", 1)[0])
 
     @filepath.setter
@@ -841,6 +868,12 @@ class DH5:
 
     @property
     def filename(self) -> Optional[str]:
+        """
+        Return the filename of the current filepath without '.h5' extension.
+
+        Returns:
+            Optional[str]: The filename of the current filepath, or None if the filepath is None.
+        """
         filepath = self.filepath
         if filepath is None:
             return None
@@ -848,18 +881,47 @@ class DH5:
 
     @property
     def save_on_edit(self):
+        """Return the current value of the save_on_edit attribute."""
         return self._save_on_edit
 
     def asdict(self):
+        """
+        Return the internal data of the object as a dictionary.
+
+        Returns:
+            dict: A dictionary representation of the object's internal data.
+        """
         return self._data
 
     def pull_available(self):
+        """
+        Check if the file has been modified elsewhere since the last save.
+
+        Raises:
+            ValueError: If the filepath has not been set.
+
+        Returns:
+            bool: True if the file has been modified, False otherwise.
+        """
         if self.filepath is None:
             raise ValueError("Cannot pull from file if it's not been set")
         file_modified = os.path.getmtime(self.filepath + ".h5")
         return self._file_modified_time != file_modified
 
     def pull(self, force_pull: bool = False):
+        """
+        Pull data from a file and reloads it into the object.
+
+        Args:
+            force_pull (bool, optional): If True, forces to update data even if the file
+            has not been modified. Defaults to False.
+
+        Raises:
+            ValueError: If the filepath has not been set.
+
+        Returns:
+            self: The updated object.
+        """
         if self.filepath is None:
             raise ValueError("Cannot pull from file if it's not been set")
 

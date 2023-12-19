@@ -1,3 +1,17 @@
+:root {
+  --doc-symbol-attribute-fg-color: #0079ff;
+  --doc-symbol-function-fg-color: #00dfa2;
+  --doc-symbol-method-fg-color: #00dfa2;
+  --doc-symbol-class-fg-color: #d1b619;
+  --doc-symbol-module-fg-color: #ff0060;
+
+  --doc-symbol-attribute-bg-color: #0079ff1a;
+  --doc-symbol-function-bg-color: #00dfa21a;
+  --doc-symbol-method-bg-color: #00dfa21a;
+  --doc-symbol-class-bg-color: #d1b6191a;
+  --doc-symbol-module-bg-color: #ff00601a;
+}
+
 [data-md-color-scheme='default'] {
   --md-primary-fg-color: #0b5394;
   --md-primary-fg-color--dark: #0c67b6;
