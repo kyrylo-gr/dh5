@@ -1,3 +1,4 @@
+# flake8: noqa: D101, D102
 """
 This is the general tests that verify the front-end implementation.
 So there is not tests on internal logic of the code. It's just a

@@ -1,3 +1,4 @@
+# flake8: noqa: D100, D101, D102
 import os
 import shutil
 
@@ -29,19 +30,16 @@ class H5NpArraySaveOnEditTest(unittest.TestCase):
         self.check = np.zeros(shape=self.size)
         self.sd[key] = SyncNp(self.check)
 
-    def compare(self):
+    def assert_arrays_equal(self, data, check):
         self.assertTrue(
-            self.compare_np_array(self.check, self.sd["test"]),
-            msg=f"In current file:\n{self.sd['test']} \n \n {self.check}",
+            self.compare_np_array(data, check),
+            msg=f"In loaded file:\n {data}\n vs\n {check}",
         )
 
+    def compare(self):
+        self.assert_arrays_equal(self.sd["test"], self.check)
         sd = DH5(DATA_FILE_PATH)
-        if not np.all(self.check == sd["test"]):
-            pass
-        self.assertTrue(
-            self.compare_np_array(self.check, sd["test"]),
-            msg=f"In loaded file:\n {sd['test']}\n vs\n {self.check}",
-        )
+        self.assert_arrays_equal(sd["test"], self.check)
 
     @staticmethod
     def compare_np_array(a1, a2):
@@ -67,6 +65,16 @@ class H5NpArraySaveOnEditTest(unittest.TestCase):
     def test_new_from_shape(self):
         self.check = np.zeros((1, 2, 3))
         self.sd["test"] = SyncNp((1, 2, 3))
+        self.compare()
+
+    def test_new_from_np_array(self):
+        self.check = np.array([1, 2, 3])
+        self.sd["test"] = SyncNp(self.check)
+        self.compare()
+
+    def test_new_from_syncnp(self):
+        self.check = SyncNp(np.array([1, 2, 3]))
+        self.sd["test"] = SyncNp(self.check)
         self.compare()
 
     def test_horizontal_change(self):
@@ -100,6 +108,23 @@ class H5NpArraySaveOnEditTest(unittest.TestCase):
 
         self.compare()
 
+    def test_changing_before_assign(self):
+        data = SyncNp(np.array([1, 2, 3]))
+        data[0] = 4
+
+        self.check = data
+        self.sd["test"] = data
+        self.compare()
+
+    def test_saving_before_assign(self):
+        data = SyncNp(np.array([1, 2, 3]))
+        data.save()
+
+        data[0] = 4
+
+        with self.assertRaises(ValueError):
+            data.save()
+
     @classmethod
     def tearDownClass(cls):
         """Remove tmp_test_data directory ones all test finished."""
@@ -116,7 +141,7 @@ class H5NpArrayTest(H5NpArraySaveOnEditTest):
         self.check = np.zeros(shape=self.size)
         self.sd["test"] = SyncNp(self.check)
 
-    def compare(self):
+    def compare(self):  # pylint: disable=W0221
         self.sd["test"].save()  # pylint: disable=E1101 # type: ignore
         return super().compare()
 
@@ -132,7 +157,7 @@ class H5NpArrayGlobalSaveTest(H5NpArrayTest):
 
 
 class H5NpArrayForceGlobalSaveTest(H5NpArraySaveOnEditTest):
-    def compare(self):
+    def compare(self):  # pylint: disable=W0221
         self.sd.save(force=True)
         return super().compare()
 

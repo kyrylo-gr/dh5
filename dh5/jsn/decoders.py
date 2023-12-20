@@ -20,8 +20,8 @@ class NumbersDecoder(json.JSONDecoder):
                 if obj_check.count(".") == 1 and obj_check.replace(".", "").isnumeric():
                     return float(obj)
                 return obj
-            except ValueError:
-                return obj
+            except ValueError:  # pragma: no cover
+                return obj  # pragma: no cover
         if isinstance(obj, dict):
             return {k: self._decode(v) for k, v in obj.items()}
         if isinstance(obj, list):

@@ -1,3 +1,4 @@
+# flake8: noqa: D101, D102, D107
 """Module contains the errors used inside DH5."""
 
 

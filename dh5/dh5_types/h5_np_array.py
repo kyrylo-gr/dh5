@@ -1,3 +1,4 @@
+# flake8: noqa: D100, D101, D102
 import os
 from typing import Optional
 import numpy as np

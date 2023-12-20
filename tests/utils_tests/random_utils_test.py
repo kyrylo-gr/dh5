@@ -1,3 +1,4 @@
+# flake8: noqa: D101, D102
 import unittest
 from dh5.utils import random_utils
 

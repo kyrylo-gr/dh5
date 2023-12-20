@@ -1,3 +1,4 @@
+# flake8: noqa: D100
 import pathlib
 import os
 from typing import Iterable, Optional, Union
@@ -14,7 +15,7 @@ class Path(type(pathlib.Path())):
     - basename
     """
 
-    def __add__(self, other: Union['Path', str]):
+    def __add__(self, other: Union["Path", str]):
         """Sum two paths as concatenation of two strings."""
         if not isinstance(other, str):
             other = str(other)
@@ -24,7 +25,7 @@ class Path(type(pathlib.Path())):
         """Create a directories if needed.
 
         If self is a file creates directories to dirname(self)."""
-        file = os.path.dirname(self) if '.' in os.path.basename(self) else self
+        file = os.path.dirname(self) if "." in os.path.basename(self) else self
         if not os.path.exists(file):
             os.makedirs(file, mode=mode, exist_ok=exist_ok)
         return self
@@ -46,7 +47,7 @@ class Path(type(pathlib.Path())):
             extension = [extension]
         if not isinstance(extension, Iterable):
             raise ValueError("Extension must be a string or an iterable")
-        extension = [ext if ext.startswith('.') else ('.' + ext) for ext in extension]
+        extension = [ext if ext.startswith(".") else ("." + ext) for ext in extension]
         path = self.as_posix()
         for ext in extension:
             if path.endswith(ext):
@@ -54,12 +55,12 @@ class Path(type(pathlib.Path())):
         return type(self)(self.as_posix() + extension[0])
 
     @property
-    def dirname(self) -> 'Path':
+    def dirname(self) -> "Path":
         """Same as os.path.dirname."""
         return type(self)(os.path.dirname(self))
 
     @property
-    def basename(self) -> 'Path':
+    def basename(self) -> "Path":
         """Same as os.path.basename."""
         return type(self)(os.path.basename(self))
 
@@ -69,12 +70,15 @@ class Path(type(pathlib.Path())):
 
 
 def get_file_path(
-    filename: Union[str, Path], *, path: Optional[Union[str, Path]] = None, extension: Optional[str] = None
+    filename: Union[str, Path],
+    *,
+    path: Optional[Union[str, Path]] = None,
+    extension: Optional[str] = None
 ) -> Path:
     """Get a Path for a file called `filename` at `path` location with `extension`."""
     filename = Path(filename)
     if extension:
-        filename.make_extension(extension)
+        filename = filename.make_extension(extension)
     if path is not None:
         return Path(path, filename)
     return Path(filename)
