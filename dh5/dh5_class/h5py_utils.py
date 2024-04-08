@@ -1,13 +1,14 @@
 """Utils to save and load h5 files."""
 
-from typing import Literal, Optional, Set, Union
 import os
+from typing import Literal, Optional, Set, Union
+
 import h5py
 import numpy as np
-from ..dh5_types.errors import FileLockedError
 
-from .types import ClassWithAsdict
+from ..errors import FileLockedError
 from .data_transformation import transform_not_dict_on_save, transform_on_open
+from .types import ClassWithAsdict
 
 
 class LockFile:

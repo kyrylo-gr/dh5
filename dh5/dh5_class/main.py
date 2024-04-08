@@ -1,19 +1,18 @@
 """DH5 class is a dictionary that is synchronized with .h5 file."""
-from copy import deepcopy
-from typing import Any, Dict, Iterable, Literal, Optional, Set, TypeVar, Union, overload
 
 import logging
 import os
-from pathlib import Path
+from copy import deepcopy
 from functools import wraps
+from pathlib import Path
+from typing import Any, Dict, Iterable, Literal, Optional, Set, TypeVar, Union, overload
 
+from ..errors import ReadOnlyKeyError
 from . import h5py_utils
 from .data_transformation import transform_to_possible_formats
 from .dict_structure import get_keys_structure, output_dict_structure
-
-from .types import DICT_OR_LIST_LIKE
 from .internal_classes import NotLoaded
-from ..dh5_types.errors import ReadOnlyKeyError
+from .types import DICT_OR_LIST_LIKE
 
 # from ..utils import
 
@@ -767,7 +766,7 @@ class DH5:
 
         self._pre_save()
 
-        if force is True:
+        if force is True or filepath is not None:
             only_update = False
 
         if isinstance(only_update, Iterable):
@@ -943,7 +942,7 @@ class DH5:
         """Close every key provided so it could be collected by the garbage collector afterwards."""
 
     @overload
-    def close_data(self, key: str):
+    def close_data(self, key: str):  # type: ignore
         """Close the key so it could be collected by the garbage collector afterwards."""
 
     def close_data(

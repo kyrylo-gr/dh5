@@ -1,6 +1,7 @@
 """All types used for typing inside dh5 module."""
 
 from typing import Callable, Optional, Protocol, Union
+
 import numpy as np
 
 
@@ -10,7 +11,7 @@ class ClassWithAsdict(Protocol):
     It should not be a dict of other classes
     """
 
-    def asdict(self) -> dict:
+    def asdict(self) -> dict:  # type: ignore
         """Return internal data as a dictionary."""
 
 
@@ -20,7 +21,7 @@ class ClassWithAsarray(Protocol):
     `asarray` class should return a np.ndarray.
     """
 
-    def asarray(self) -> Union[np.ndarray, list]:
+    def asarray(self) -> Union[np.ndarray, list]:  # type: ignore
         """Return internal data as an array."""
 
 

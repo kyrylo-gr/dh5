@@ -4,6 +4,7 @@ repo_url: https://github.com/kyrylo-gr/dh5
 theme:
   name: material
   logo: images/dh5-logo-small.png
+  favicon: images/dh5-logo-square.png
   palette:
     - media: '(prefers-color-scheme: light)'
       scheme: default

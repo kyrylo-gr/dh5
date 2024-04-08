@@ -8,14 +8,12 @@ everything is good.
 
 import os
 import shutil
-
 import unittest
 
 import numpy as np
 
 from dh5 import DH5
 from dh5.dh5_class import h5py_utils
-
 
 TEST_DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(TEST_DIR, "tmp_test_data")
@@ -635,7 +633,7 @@ class SavingOnEditDifferentFormatTest(unittest.TestCase):
             b: int = 4
 
         d = self.create_file()
-        d["t"] = Test()
+        d["t"] = Test()  # type: ignore
 
         self.assertEqual(d["t"]["a"], 5)
         self.assertEqual(d["t"]["b"], 4)
@@ -798,7 +796,7 @@ class SavingManualDifferentFormatTest(SavingOnEditDifferentFormatTest):
     def create_file(self):
         return DH5(DATA_FILE_PATH, save_on_edit=False, overwrite=False, read_only=False)
 
-    def read_file(self, d):
+    def read_file(self, d):  # type: ignore
         d.save()
         return DH5(DATA_FILE_PATH)
 

@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="dh5",
-    version="0.7.8",
+    version="0.8.0",
     author="LKB-OMQ",
     author_email="cryo.paris.su@gmail.com",
     description="Data H5. Work with hdf5 as classical dictionary.",

@@ -1,11 +1,12 @@
 """Contains all custom JSON decoders used."""
+
 import json
 
 
 class NumbersDecoder(json.JSONDecoder):
     """Decode float and int."""
 
-    def decode(self, s):  # pylint: disable=W0221
+    def decode(self, s):  # pylint: disable=W0221 # type: ignore
         """Decode using the default decoder and then decode numbers."""
         result = super().decode(s)
         return self._decode(result)
