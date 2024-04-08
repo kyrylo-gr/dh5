@@ -60,12 +60,13 @@ class SaveTest(unittest.TestCase):
     """Testing dh5.load()."""
 
     data = {"a": 1, "b": 2}
+    data2 = {"c": 3, "d": 4}
 
     def setUp(self):
         os.makedirs(DATA_DIR, exist_ok=True)
 
-    def test_save(self):
-        file = dh5.save(DATA_FILE_PATH, self.data)
+    def test_save_new(self):
+        file = dh5.save(self.data, DATA_FILE_PATH)
         for key, value in self.data.items():
             self.assertEqual(file[key], value)
 
@@ -73,6 +74,48 @@ class SaveTest(unittest.TestCase):
         for key, value in self.data.items():
             self.assertEqual(file2[key], value)
 
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(DATA_DIR)
+    def test_save_overwrite_unset(self):
+        dh5.save(self.data, DATA_FILE_PATH)
+
+        with self.assertRaises(FileExistsError):
+            dh5.save(self.data, DATA_FILE_PATH)
+
+    def test_save_overwrite_false(self):
+        dh5.save(self.data, DATA_FILE_PATH)
+        file = dh5.save(self.data2, DATA_FILE_PATH, overwrite=False).load()
+
+        for key, value in {**self.data, **self.data2}.items():
+            self.assertEqual(file[key], value)
+
+        file2 = dh5.load(filepath=DATA_FILE_PATH, mode="r")
+        for key, value in {**self.data, **self.data2}.items():
+            self.assertEqual(file2[key], value)
+
+    def test_save_overwrite_true(self):
+        dh5.save(self.data, DATA_FILE_PATH, overwrite=True)
+        file = dh5.save(self.data2, DATA_FILE_PATH, overwrite=True).load()
+        for key, value in self.data2.items():
+            self.assertEqual(file[key], value)
+        for key in self.data.keys():
+            self.assertFalse(key in file, msg=f"key: {key} in file: {file}")
+
+        file2 = dh5.load(filepath=DATA_FILE_PATH, mode="r")
+        for key, value in self.data2.items():
+            self.assertEqual(file2[key], value)
+        for key in self.data:
+            self.assertFalse(key in file2)
+
+    def test_save_append(self):
+        dh5.save(self.data, DATA_FILE_PATH)
+        file = dh5.save(self.data2, DATA_FILE_PATH, mode="a").load()
+        for key, value in {**self.data, **self.data2}.items():
+            self.assertEqual(file[key], value)
+
+        file2 = dh5.load(filepath=DATA_FILE_PATH, mode="r")
+        for key, value in {**self.data, **self.data2}.items():
+            self.assertEqual(file2[key], value)
+
+    def tearDown(self):
+        if os.path.exists(DATA_FILE_PATH):
+            os.remove(DATA_FILE_PATH)
+        # shutil.rmtree(DATA_DIR)

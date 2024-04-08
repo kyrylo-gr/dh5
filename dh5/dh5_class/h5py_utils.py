@@ -7,8 +7,8 @@ import h5py
 import numpy as np
 
 from ..errors import FileLockedError
+from ..types import ClassWithAsdict
 from .data_transformation import transform_not_dict_on_save, transform_on_open
-from .types import ClassWithAsdict
 
 
 class LockFile:

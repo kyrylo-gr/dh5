@@ -1,5 +1,5 @@
 ---
-title: DH5 Class.
+title: DH5.
 ---
 
 This page contains all DH5 class methods. If you wonder how to start with `dh5` library, please refer to the [First Steps guide](../starting_guide/first_steps.md).

@@ -1,8 +1,9 @@
 # flake8: noqa: D100, D101, D102
 import os
 from typing import Optional
-import numpy as np
+
 import h5py
+import numpy as np
 
 
 class SyncNp(np.ndarray):
@@ -33,7 +34,7 @@ class SyncNp(np.ndarray):
         if self.__save_on_edit__:  # or not self.__initialized__:
             self.save(only_update=False)
 
-    def __setitem__(self, __key, __value):
+    def __setitem__(self, __key, __value):  # type: ignore
         if self.__last_changes__ is None:
             self.__last_changes__ = []
         self.__last_changes__.append(__key)

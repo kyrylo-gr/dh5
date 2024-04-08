@@ -384,13 +384,13 @@ class InitSetupTest(unittest.TestCase):
         self.assertEqual(d["t"], 3)
 
     def test_raise_file_exist(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(FileExistsError):
             DH5(DATA_FILE_PATH, read_only=False)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(FileExistsError):
             DH5(DATA_FILE_PATH, read_only=False, save_on_edit=True)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(FileExistsError):
             DH5(DATA_FILE_PATH, save_on_edit=True)
 
     def test_open_to_save_with_save_on_edit(self):
@@ -968,7 +968,7 @@ class ModesDuringInitTest(unittest.TestCase):
         self.assertTrue(sd1.__similar__(sd2))
 
     def test_read_equal_mode(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(FileExistsError):
             DH5(DATA_FILE_PATH, mode="r=")  # type: ignore
 
     def test_append_mode(self):
@@ -1058,7 +1058,7 @@ class ModesDuringInitTest(unittest.TestCase):
 
     def test_not_overwriting_in_write_mode(self):
         _ = DH5(DATA_FILE_PATH, overwrite=True, read_only=False)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(FileExistsError):
             _ = DH5(DATA_FILE_PATH, mode="w")
 
     @classmethod

@@ -1,3 +1,7 @@
+---
+title: DH5 Class.
+---
+
 <!-- prettier-ignore -->
 ::: dh5.DH5
     options:

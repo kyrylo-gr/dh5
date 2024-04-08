@@ -67,6 +67,7 @@ nav:
   - User Guide:
       - DH5 class: dh5
       - DataTypes: types/
+      - More: dh5/more
   - Developer Guide: develop/
   - Releases: releases/
   - About: about/

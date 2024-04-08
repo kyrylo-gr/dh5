@@ -8,11 +8,11 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Literal, Optional, Set, TypeVar, Union, overload
 
 from ..errors import ReadOnlyKeyError
+from ..types import DICT_OR_LIST_LIKE
 from . import h5py_utils
 from .data_transformation import transform_to_possible_formats
 from .dict_structure import get_keys_structure, output_dict_structure
 from .internal_classes import NotLoaded
-from .types import DICT_OR_LIST_LIKE
 
 # from ..utils import
 
@@ -138,6 +138,7 @@ class DH5:
             filepath = str(filepath)
 
         self._data: Dict[str, Any] = data or {}
+        # transform_to_possible_formats(self._data)
         self._keys: Set[str] = set(self._data.keys())
         self._last_update = set()
         self._save_on_edit = save_on_edit
@@ -167,7 +168,7 @@ class DH5:
 
             if os.path.exists(filepath):
                 if overwrite is None and not read_only:
-                    raise ValueError(
+                    raise FileExistsError(
                         "File with the same name already exists. So you should explicitly "
                         "provide what to do with it. Set `overwrite=True` to replace file. "
                         "Set `overwrite=False` if you want to open existing file and work with it."
@@ -240,7 +241,7 @@ class DH5:
 
     def _load_from_h5(
         self, filepath: Optional[str] = None, key: Optional[Union[str, Set[str]]] = None
-    ):
+    ) -> Set[str]:
         """Load data from h5 to self._data."""
         filepath = filepath or self._filepath
         if filepath is None:
@@ -248,7 +249,18 @@ class DH5:
         filepath = filepath if filepath.endswith(".h5") else filepath + ".h5"
         data = h5py_utils.open_h5(filepath, key=key, key_prefix=self._key_prefix)
         self._file_modified_time = os.path.getmtime(filepath)
-        self._update(data)
+        return self._update(data)
+
+    def load(self, filepath: Optional[str] = None, key: Optional[Union[str, Set[str]]] = None):
+        """Load data from h5 into current object."""
+
+        updated_from_other_file = not (filepath is None)
+        updated_key = self._load_from_h5(filepath=filepath, key=key)
+        if updated_from_other_file:
+            for key in updated_key:
+                self._keys.add(key)
+
+        return self
 
     def lock_data(self: _SELF, keys: Optional[Iterable[str]] = None) -> _SELF:
         """Locks the specified keys in the database so they cannot be changed.
@@ -393,6 +405,8 @@ class DH5:
             self._unopened_keys.discard(key)
 
         self._data.update(kwds)
+
+        return set(kwds.keys())
 
     @editing
     def pop(self, key: str) -> Union[Any, NotLoaded]:

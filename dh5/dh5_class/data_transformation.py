@@ -1,9 +1,11 @@
 """Data transformation utils."""
+
 import json
 from typing import Iterable, Optional, Sized
 
 import numpy as np
-from .types import DICT_OR_LIST_LIKE
+
+from ..types import DICT_OR_LIST_LIKE
 
 
 def np_array_check(lst, size: Optional[int] = None) -> int:

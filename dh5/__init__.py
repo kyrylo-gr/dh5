@@ -1,5 +1,6 @@
 # flake8: noqa: F401 # pylint: disable=E0401
 import typing as _t
+from copy import deepcopy as _deepcopy
 
 from . import dh5_types
 from .dh5_class import DH5
@@ -47,7 +48,13 @@ def load(
     )
 
 
-def save(filepath: str, data: dict, **kwds):
+def save(
+    data: dict,
+    filepath: str,
+    mode: _t.Literal["w", "a"] = "w",
+    overwrite: _t.Optional[bool] = None,
+    **kwds,
+):
     """Save data to H5 file.
 
     Args:
@@ -58,5 +65,6 @@ def save(filepath: str, data: dict, **kwds):
     Returns:
         DH5: DH5 object with data.
     """
-    dh5 = DH5(data=data, **kwds)
+
+    dh5 = DH5(data=_deepcopy(data), **kwds, filepath=filepath, overwrite=overwrite, mode=mode)
     return dh5.save(filepath=filepath)
