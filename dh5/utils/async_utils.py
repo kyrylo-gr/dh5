@@ -3,8 +3,7 @@ import threading
 
 
 def sleep(delay):
-    """
-    Sleep for the specified delay in seconds.
+    """Sleep for the specified delay in seconds.
 
     Args:
         delay (float): The delay in seconds.

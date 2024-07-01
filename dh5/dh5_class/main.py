@@ -2,10 +2,11 @@
 
 import logging
 import os
+from collections.abc import Iterable
 from copy import deepcopy
 from functools import wraps
 from pathlib import Path
-from typing import Any, Dict, Iterable, Literal, Optional, Set, TypeVar, Union, overload
+from typing import Any, Dict, Literal, Optional, Set, TypeVar, Union, overload
 
 from ..errors import ReadOnlyKeyError
 from ..types import DICT_OR_LIST_LIKE
@@ -263,8 +264,7 @@ class DH5:
         self, filepath: Optional[str] = None, key: Optional[Union[str, Set[str]]] = None
     ):
         """Load data from h5 into current object."""
-
-        updated_from_other_file = not (filepath is None)
+        updated_from_other_file = filepath is not None
         updated_key = self._load_from_h5(filepath=filepath, key=key)
         if updated_from_other_file:
             for key in updated_key:
@@ -803,8 +803,7 @@ class DH5:
         filepath: Optional[str] = None,
         force: Optional[bool] = None,
     ):
-        """
-        Save the data to a file.
+        """Save the data to a file.
 
         Args:
             only_update (Union[bool, Iterable[str]], optional): Determines whether to save only
@@ -923,8 +922,7 @@ class DH5:
 
     @property
     def filepath(self):
-        """
-        Return the filepath without the '.h5' extension.
+        """Return the filepath without the '.h5' extension.
 
         If the filepath is None, returns None.
         """
@@ -938,8 +936,7 @@ class DH5:
 
     @property
     def filename(self) -> Optional[str]:
-        """
-        Return the filename of the current filepath without '.h5' extension.
+        """Return the filename of the current filepath without '.h5' extension.
 
         Returns:
             Optional[str]: The filename of the current filepath, or None if the filepath is None.
@@ -955,8 +952,7 @@ class DH5:
         return self._save_on_edit
 
     def asdict(self):
-        """
-        Return the internal data of the object as a dictionary.
+        """Return the internal data of the object as a dictionary.
 
         Returns:
             dict: A dictionary representation of the object's internal data.
@@ -964,8 +960,7 @@ class DH5:
         return self._data
 
     def pull_available(self):
-        """
-        Check if the file has been modified elsewhere since the last save.
+        """Check if the file has been modified elsewhere since the last save.
 
         Raises:
             ValueError: If the filepath has not been set.
@@ -979,8 +974,7 @@ class DH5:
         return self._file_modified_time != file_modified
 
     def pull(self, force_pull: bool = False):
-        """
-        Pull data from a file and reloads it into the object.
+        """Pull data from a file and reloads it into the object.
 
         Args:
             force_pull (bool, optional): If True, forces to update data even if the file

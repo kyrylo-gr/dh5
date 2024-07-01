@@ -9,8 +9,7 @@ import numpy as np
 def output_dict_structure(
     data: dict, additional_info: Optional[Dict[str, str]] = None
 ) -> str:
-    """
-    Convert a dictionary into a JSON-like string representation of its structure.
+    """Convert a dictionary into a JSON-like string representation of its structure.
 
     Args:
         data (dict): The input dictionary.
@@ -30,8 +29,7 @@ def output_dict_structure(
 
 
 def dict_to_json_format_str(data: dict) -> str:
-    """
-    Convert a dictionary to a JSON formatted string.
+    """Convert a dictionary to a JSON formatted string.
 
     Args:
         data (dict): The dictionary to be converted.
@@ -43,8 +41,7 @@ def dict_to_json_format_str(data: dict) -> str:
 
 
 def get_dict_structure(data: dict, level: int = 3) -> dict:
-    """
-    Recursively analyzes the structure of a dictionary.
+    """Recursively analyzes the structure of a dictionary.
     Returns a dictionary containing information about the types and shapes of the values.
 
     Args:
@@ -74,7 +71,7 @@ def get_dict_structure(data: dict, level: int = 3) -> dict:
             structure[k] = f"shape: {np.shape(v)} (type: {type(v).__name__})"
         elif isinstance(v, (int, np.int_)):  # type: ignore
             structure[k] = f"{v:.0f} (type : {type(v).__name__})"
-        elif isinstance(v, (float, np.floating, complex, np.complex_)):  # type: ignore
+        elif isinstance(v, (float, np.floating, complex, np.complex128)):  # type: ignore
             str_value = f"{v:.3f}" if 0.1 <= abs(v) <= 100.0 else f"{v:.3e}"
             structure[k] = f"{str_value} (type : {type(v).__name__})"
         else:
@@ -83,8 +80,7 @@ def get_dict_structure(data: dict, level: int = 3) -> dict:
 
 
 def get_keys_structure(data) -> dict:
-    """
-    Recursively traverses a dictionary and returns its structure with keys and None values.
+    """Recursively traverses a dictionary and returns its structure with keys and None values.
 
     Args:
         data (dict): The dictionary to analyze.

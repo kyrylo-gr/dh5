@@ -18,7 +18,7 @@ class LockFile:
         To use the LockFile context manager, simply wrap your code that writes to a file with it.
         This will ensure that only one process can write to the file at a time.
 
-        Example:
+    Example:
         ```
         with LockFile("data.txt"):
              # Code that writes to the file
@@ -193,8 +193,7 @@ def save_dict(
 
 # /doc add example to this doc
 def keys_h5(filename, key_prefix: Optional[str] = None) -> Set[str]:
-    """
-    Return the keys of an h5 file.
+    """Return the keys of an h5 file.
 
     Args:
         filename (str): Full filepath to the h5 file.
@@ -224,8 +223,7 @@ def del_dict(
     key: str,
     key_prefix: Optional[str] = None,
 ) -> float:
-    """
-    Delete a key from an h5 file.
+    """Delete a key from an h5 file.
 
     Args:
         filename (str): Full filepath to the file.

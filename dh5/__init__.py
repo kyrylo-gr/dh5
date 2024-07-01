@@ -36,7 +36,6 @@ def load(
         open_on_init (Optional[bool], optional): open_on_init. Defaults to True.
 
     """
-
     return DH5(
         filepath_or_data,
         mode=mode,
@@ -66,7 +65,6 @@ def save(
     Returns:
         DH5: DH5 object with data.
     """
-
     dh5 = DH5(
         data=_deepcopy(data), **kwds, filepath=filepath, overwrite=overwrite, mode=mode
     )

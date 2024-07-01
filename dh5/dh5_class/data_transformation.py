@@ -1,7 +1,8 @@
 """Data transformation utils."""
 
 import json
-from typing import Iterable, Optional, Sized
+from collections.abc import Iterable, Sized
+from typing import Optional
 
 import numpy as np
 

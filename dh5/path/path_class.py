@@ -1,7 +1,8 @@
 # flake8: noqa: D100
-import pathlib
 import os
-from typing import Iterable, Optional, Union
+import pathlib
+from collections.abc import Iterable
+from typing import Optional, Union
 
 
 class Path(type(pathlib.Path())):
@@ -24,7 +25,8 @@ class Path(type(pathlib.Path())):
     def makedirs(self, mode=0o777, exist_ok=False):
         """Create a directories if needed.
 
-        If self is a file creates directories to dirname(self)."""
+        If self is a file creates directories to dirname(self).
+        """
         file = os.path.dirname(self) if "." in os.path.basename(self) else self
         if not os.path.exists(file):
             os.makedirs(file, mode=mode, exist_ok=exist_ok)

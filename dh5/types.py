@@ -16,8 +16,7 @@ class ClassWithAsdict(Protocol):
 
 
 class ClassWithAsarray(Protocol):
-    """
-    Any class with predefined `asarray` attribute.
+    """Any class with predefined `asarray` attribute.
     `asarray` class should return a np.ndarray.
     """
 

@@ -22,4 +22,5 @@ from dh5 import jsn
 data = jsn.read(path)
 ```
 """
+
 from .methods import read, write  # noqa: F401

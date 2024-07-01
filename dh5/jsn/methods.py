@@ -1,9 +1,10 @@
 # flake8: noqa: D100
 import json
 from typing import Optional, Type, Union
+
+from ..path import Path, get_file_path
 from .decoders import NumbersDecoder
 from .encoders import StringEncoder
-from ..path import Path, get_file_path
 
 
 def write(
