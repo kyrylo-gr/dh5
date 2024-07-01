@@ -1,8 +1,7 @@
 # flake8: noqa: D100
 import os
 import pathlib
-from collections.abc import Iterable
-from typing import Optional, Union
+from typing import Iterable, Optional, Union
 
 
 class Path(type(pathlib.Path())):
@@ -75,7 +74,7 @@ def get_file_path(
     filename: Union[str, Path],
     *,
     path: Optional[Union[str, Path]] = None,
-    extension: Optional[str] = None
+    extension: Optional[str] = None,
 ) -> Path:
     """Get a Path for a file called `filename` at `path` location with `extension`."""
     filename = Path(filename)
