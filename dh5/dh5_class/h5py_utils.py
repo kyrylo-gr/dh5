@@ -84,7 +84,9 @@ def open_h5_group(
 
 
 def open_h5(
-    fullpath: str, key: Optional[Union[str, Set[str]]] = None, key_prefix: Optional[str] = None
+    fullpath: str,
+    key: Optional[Union[str, Set[str]]] = None,
+    key_prefix: Optional[str] = None,
 ) -> dict:
     """Open h5 file and return dict.
 
@@ -135,7 +137,9 @@ def save_sub_dict(
         data = transform_not_dict_on_save(data)  # type: ignore
         if isinstance(data, (np.ndarray, list)):
             use_compression = "gzip" if use_compression is True else use_compression
-            group.create_dataset(key, data=data, compression=use_compression)  # compression="gzip"
+            group.create_dataset(
+                key, data=data, compression=use_compression
+            )  # compression="gzip"
         else:
             group.create_dataset(key, data=data)
 

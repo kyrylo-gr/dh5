@@ -57,7 +57,8 @@ class Function:
             eval(cc)  # pylint: disable=W0123 # noqa: DUO104
         except SyntaxError:
             logging.warning(
-                "Function %s cannot be loaded because unexpected SyntaxError.", self.original_name
+                "Function %s cannot be loaded because unexpected SyntaxError.",
+                self.original_name,
             )
             return
 

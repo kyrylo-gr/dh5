@@ -146,7 +146,9 @@ class DH5:
         self._key_prefix: Optional[str] = kwds.get("key_prefix")
 
         if read_only is None:
-            read_only = (save_on_edit is False and not overwrite) and filepath is not None
+            read_only = (
+                save_on_edit is False and not overwrite
+            ) and filepath is not None
 
         if open_on_init is False and overwrite is True:
             raise ValueError("Cannot overwrite file and open_on_init=False mode")
@@ -164,7 +166,9 @@ class DH5:
             filepath = filepath if filepath.endswith(".h5") else filepath + ".h5"
 
             if (overwrite or save_on_edit) and read_only:
-                raise ValueError("""Cannot open file in read_only mode and overwrite it.""")
+                raise ValueError(
+                    """Cannot open file in read_only mode and overwrite it."""
+                )
 
             if os.path.exists(filepath):
                 if overwrite is None and not read_only:
@@ -182,7 +186,9 @@ class DH5:
                     if self._open_on_init:
                         self._load_from_h5(filepath)
                     elif self._open_on_init is False:
-                        self._keys = h5py_utils.keys_h5(filepath, key_prefix=self._key_prefix)
+                        self._keys = h5py_utils.keys_h5(
+                            filepath, key_prefix=self._key_prefix
+                        )
                         self._unopened_keys.update(self._keys)
 
             elif read_only:
@@ -226,7 +232,9 @@ class DH5:
             **kwds,
         )
 
-    def __init__filepath__(self, *, filepath: str, filekey: str, save_on_edit: bool = False, **_):
+    def __init__filepath__(
+        self, *, filepath: str, filekey: str, save_on_edit: bool = False, **_
+    ):
         """Initialize a filepath. It allows to save sub DH5 objects independently.
 
         Args:
@@ -251,7 +259,9 @@ class DH5:
         self._file_modified_time = os.path.getmtime(filepath)
         return self._update(data)
 
-    def load(self, filepath: Optional[str] = None, key: Optional[Union[str, Set[str]]] = None):
+    def load(
+        self, filepath: Optional[str] = None, key: Optional[Union[str, Set[str]]] = None
+    ):
         """Load data from h5 into current object."""
 
         updated_from_other_file = not (filepath is None)
@@ -284,7 +294,9 @@ class DH5:
 
         """
         if self._read_only is True:
-            raise ValueError("Cannot lock specific data and everything is locked by read_only mode")
+            raise ValueError(
+                "Cannot lock specific data and everything is locked by read_only mode"
+            )
         if not isinstance(self._read_only, set):
             self._read_only = set()
         if keys is None:
@@ -358,7 +370,9 @@ class DH5:
         return (self._read_only) and (self._read_only is True or key in self._read_only)
 
     @editing
-    def update(self: _SELF, __m: Optional[dict] = None, **kwds: "DICT_OR_LIST_LIKE") -> _SELF:
+    def update(
+        self: _SELF, __m: Optional[dict] = None, **kwds: "DICT_OR_LIST_LIKE"
+    ) -> _SELF:
         """Update data from a dictionary or keyword arguments.
 
         See `DH5.data_transformation` to learn more
@@ -547,11 +561,15 @@ class DH5:
                 )
             if len(__key) == 1:
                 return self.__getitem__(__key[0])
-            raise ValueError("Key should be a string or tuple with at least one element")
+            raise ValueError(
+                "Key should be a string or tuple with at least one element"
+            )
         return self.__get_data_or_raise__(__key)
 
     @editing
-    def __setitem__(self, __key: Union[str, tuple], __value: "DICT_OR_LIST_LIKE") -> None:
+    def __setitem__(
+        self, __key: Union[str, tuple], __value: "DICT_OR_LIST_LIKE"
+    ) -> None:
         """Set value corresponding to the given key.
 
         See [`DH5.data_transformation`](data_transformation.md) to learn more
@@ -563,7 +581,9 @@ class DH5:
         """
         if isinstance(__key, tuple):
             if not __key or len(__key) == 1 or len(__key) == 0:
-                raise ValueError("Key should be a string or tuple with at least two elements")
+                raise ValueError(
+                    "Key should be a string or tuple with at least two elements"
+                )
 
             self.__add_key(__key[0])
             if self.__check_read_only_true(__key[0]):
@@ -583,9 +603,13 @@ class DH5:
                 self._classes_should_be_saved_internally.add(__key)
 
             if hasattr(__value, "__init__filepath__") and self._filepath:
-                key = __key if self._key_prefix is None else f"{self._key_prefix}/{__key}"
+                key = (
+                    __key if self._key_prefix is None else f"{self._key_prefix}/{__key}"
+                )
                 __value.__init__filepath__(  # type: ignore
-                    filepath=self._filepath, filekey=key, save_on_edit=self._save_on_edit
+                    filepath=self._filepath,
+                    filekey=key,
+                    save_on_edit=self._save_on_edit,
                 )
 
             if hasattr(__value, "__post__init__"):
@@ -599,7 +623,12 @@ class DH5:
 
     def __getattr__(self, __name: str):
         """Call if __getattribute__ does not work."""
-        if len(__name) > 1 and __name[0] == "i" and __name[1:].isdigit() and __name not in self:
+        if (
+            len(__name) > 1
+            and __name[0] == "i"
+            and __name[1:].isdigit()
+            and __name not in self
+        ):
             __name = __name[1:]
         if __name in self:
             data = self.get(__name)
@@ -715,15 +744,25 @@ class DH5:
                 if isinstance(self._read_only, set)
                 else None
             )
-            self._repr = output_dict_structure(self._data, additional_info=additional_info) + (
+            self._repr = output_dict_structure(
+                self._data, additional_info=additional_info
+            ) + (
                 f"\nUnloaded keys: {self._unopened_keys}" if self._unopened_keys else ""
             )
 
     def __repr__(self):
         self._get_repr()
 
-        not_saved = "" if self._last_data_saved or self._read_only is True else " (not saved)"
-        mode = "r" if self._read_only is True else "w" if self._read_only is False else "rw"
+        not_saved = (
+            "" if self._last_data_saved or self._read_only is True else " (not saved)"
+        )
+        mode = (
+            "r"
+            if self._read_only is True
+            else "w"
+            if self._read_only is False
+            else "rw"
+        )
         mode = "l" if self._filepath is None and self._read_only is not True else mode
         not_saved = "" if mode == "l" else not_saved
 
@@ -746,7 +785,8 @@ class DH5:
         return (
             self._filepath == other._filepath  # pylint: disable=protected-access
             and self._read_only == other._read_only  # pylint: disable=protected-access
-            and self._save_on_edit == other._save_on_edit  # pylint: disable=protected-access
+            and self._save_on_edit
+            == other._save_on_edit  # pylint: disable=protected-access
             and self.__should_initialized
             == other.__should_initialized  # pylint: disable=protected-access
         )
@@ -785,7 +825,9 @@ class DH5:
                 The file should be reopened in write mode before saving.
         """
         if self._read_only is True:
-            raise ValueError("Cannot save opened in a read-only mode. Should reopen the file")
+            raise ValueError(
+                "Cannot save opened in a read-only mode. Should reopen the file"
+            )
 
         self._pre_save()
 
@@ -865,12 +907,18 @@ class DH5:
         )
 
     @staticmethod
-    def _check_if_filepath_was_set(filepath: Optional[str], filepath2: Optional[str]) -> str:
+    def _check_if_filepath_was_set(
+        filepath: Optional[str], filepath2: Optional[str]
+    ) -> str:
         """Return path to the file with filename, but without extension."""
         filepath = filepath or filepath2
         if filepath is None:
-            raise ValueError("Should provide filepath or set self.filepath before saving")
-        filepath = (filepath.rsplit(".h5", 1)[0]) if filepath.endswith(".h5") else filepath
+            raise ValueError(
+                "Should provide filepath or set self.filepath before saving"
+            )
+        filepath = (
+            (filepath.rsplit(".h5", 1)[0]) if filepath.endswith(".h5") else filepath
+        )
         return filepath
 
     @property

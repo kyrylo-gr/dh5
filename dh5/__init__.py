@@ -67,5 +67,7 @@ def save(
         DH5: DH5 object with data.
     """
 
-    dh5 = DH5(data=_deepcopy(data), **kwds, filepath=filepath, overwrite=overwrite, mode=mode)
+    dh5 = DH5(
+        data=_deepcopy(data), **kwds, filepath=filepath, overwrite=overwrite, mode=mode
+    )
     return dh5.save(filepath=filepath)
