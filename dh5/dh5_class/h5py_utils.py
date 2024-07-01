@@ -18,7 +18,7 @@ class LockFile:
         To use the LockFile context manager, simply wrap your code that writes to a file with it.
         This will ensure that only one process can write to the file at a time.
 
-        Example:
+    Example:
         ```
         with LockFile("data.txt"):
              # Code that writes to the file
@@ -84,7 +84,9 @@ def open_h5_group(
 
 
 def open_h5(
-    fullpath: str, key: Optional[Union[str, Set[str]]] = None, key_prefix: Optional[str] = None
+    fullpath: str,
+    key: Optional[Union[str, Set[str]]] = None,
+    key_prefix: Optional[str] = None,
 ) -> dict:
     """Open h5 file and return dict.
 
@@ -135,7 +137,9 @@ def save_sub_dict(
         data = transform_not_dict_on_save(data)  # type: ignore
         if isinstance(data, (np.ndarray, list)):
             use_compression = "gzip" if use_compression is True else use_compression
-            group.create_dataset(key, data=data, compression=use_compression)  # compression="gzip"
+            group.create_dataset(
+                key, data=data, compression=use_compression
+            )  # compression="gzip"
         else:
             group.create_dataset(key, data=data)
 
@@ -189,8 +193,7 @@ def save_dict(
 
 # /doc add example to this doc
 def keys_h5(filename, key_prefix: Optional[str] = None) -> Set[str]:
-    """
-    Return the keys of an h5 file.
+    """Return the keys of an h5 file.
 
     Args:
         filename (str): Full filepath to the h5 file.
@@ -220,8 +223,7 @@ def del_dict(
     key: str,
     key_prefix: Optional[str] = None,
 ) -> float:
-    """
-    Delete a key from an h5 file.
+    """Delete a key from an h5 file.
 
     Args:
         filename (str): Full filepath to the file.

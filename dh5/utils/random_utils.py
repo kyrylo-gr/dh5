@@ -1,5 +1,6 @@
 """Random utilities for the dh5 package."""
-from typing import Optional, Tuple, Union, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 if TYPE_CHECKING:
     from pathlib import Path  # pragma: no cover
@@ -51,8 +52,7 @@ def lstrip_int(line: str) -> Optional[Tuple[str, str, str]]:
 
 
 def get_path_from_filename(filename: Union[str, "Path"]) -> Union[str, tuple]:
-    """
-    Given a filename, returns the path to the file.
+    """Given a filename, returns the path to the file.
 
     If the filename contains a path, returns the filename as is.
     If the filename ends with '.h5', removes the extension.

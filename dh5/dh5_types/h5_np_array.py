@@ -24,7 +24,9 @@ class SyncNp(np.ndarray):
         data = data.view(cls)
         return data
 
-    def __init__filepath__(self, *, filepath: str, filekey: str, save_on_edit: bool = False, **_):
+    def __init__filepath__(
+        self, *, filepath: str, filekey: str, save_on_edit: bool = False, **_
+    ):
         self.__filename__ = filepath
         self.__filekey__ = filekey
         self.__save_on_edit__ = save_on_edit
@@ -49,7 +51,9 @@ class SyncNp(np.ndarray):
             return self
 
         if not self.__filename__ or not self.__filekey__:
-            raise ValueError("Cannot save changes without filename and filekey provided")
+            raise ValueError(
+                "Cannot save changes without filename and filekey provided"
+            )
 
         if os.path.dirname(self.__filename__) and not os.path.exists(
             os.path.dirname(self.__filename__)

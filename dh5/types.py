@@ -16,8 +16,7 @@ class ClassWithAsdict(Protocol):
 
 
 class ClassWithAsarray(Protocol):
-    """
-    Any class with predefined `asarray` attribute.
+    """Any class with predefined `asarray` attribute.
     `asarray` class should return a np.ndarray.
     """
 
@@ -33,11 +32,11 @@ DICT_OR_LIST_LIKE = Optional[
         ClassWithAsdict,
         ClassWithAsarray,
         np.int_,
-        np.float_,
+        np.floating,
         float,
         int,
         str,
         Callable,
     ]
 ]
-RIGHT_DATA_TYPE = Union[dict, np.ndarray, np.int_, np.float_, float, int]
+RIGHT_DATA_TYPE = Union[dict, np.ndarray, np.int_, np.floating, float, int]

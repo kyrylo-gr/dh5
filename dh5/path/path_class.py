@@ -1,6 +1,6 @@
 # flake8: noqa: D100
-import pathlib
 import os
+import pathlib
 from typing import Iterable, Optional, Union
 
 
@@ -24,7 +24,8 @@ class Path(type(pathlib.Path())):
     def makedirs(self, mode=0o777, exist_ok=False):
         """Create a directories if needed.
 
-        If self is a file creates directories to dirname(self)."""
+        If self is a file creates directories to dirname(self).
+        """
         file = os.path.dirname(self) if "." in os.path.basename(self) else self
         if not os.path.exists(file):
             os.makedirs(file, mode=mode, exist_ok=exist_ok)
@@ -73,7 +74,7 @@ def get_file_path(
     filename: Union[str, Path],
     *,
     path: Optional[Union[str, Path]] = None,
-    extension: Optional[str] = None
+    extension: Optional[str] = None,
 ) -> Path:
     """Get a Path for a file called `filename` at `path` location with `extension`."""
     filename = Path(filename)

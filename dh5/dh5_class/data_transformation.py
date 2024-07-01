@@ -24,7 +24,11 @@ def np_array_check(lst, size: Optional[int] = None) -> int:
     [1, [2, 3], 4] -> Cannot be converted to np.ndarray. Return -1.
 
     """
-    if isinstance(lst, Iterable) and isinstance(lst, Sized) and not isinstance(lst, str):
+    if (
+        isinstance(lst, Iterable)
+        and isinstance(lst, Sized)
+        and not isinstance(lst, str)
+    ):
         # if isinstance(lst, (list, np.ndarray)):
         if size is not None and size != len(lst):
             return -1  # pragma: no cover
@@ -99,7 +103,9 @@ def transform_not_dict_on_save(value, level=0):
                 return "__json__" + json.dumps(value)
             return value
         except TypeError:
-            value_transformed = [transform_not_dict_on_save(v, level=level + 1) for v in value]
+            value_transformed = [
+                transform_not_dict_on_save(v, level=level + 1) for v in value
+            ]
             return "__json__" + json.dumps(value_transformed)
 
     if callable(value):

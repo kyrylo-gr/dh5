@@ -16,7 +16,9 @@ class ReadOnlyKeyError(KeyError):
         if isinstance(key, str):
             self.message = f"Cannot {action} a read-only key '{key}'."
         elif isinstance(key, (list, tuple, set)):  # pragma: no cover
-            self.message = f"Cannot {action} a read-only keys {key}."  # pragma: no cover
+            self.message = (
+                f"Cannot {action} a read-only keys {key}."  # pragma: no cover
+            )
         else:  # pragma: no cover
             self.message = f"Cannot {action} a read-only object."  # pragma: no cover
         super().__init__(self.message)
