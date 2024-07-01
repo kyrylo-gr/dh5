@@ -3,6 +3,7 @@ import typing as _t
 from copy import deepcopy as _deepcopy
 
 from . import dh5_types
+from .__config__ import __version__
 from .dh5_class import DH5
 
 if _t.TYPE_CHECKING:

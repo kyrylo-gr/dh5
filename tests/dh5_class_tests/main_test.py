@@ -541,7 +541,7 @@ class ReadModeTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             d.get("dict")["a"] = 0
 
-        d["dict"]["a"] = 0  # will not raise an error, but also wont change result
+        d["dict"]["a"] = 0  # will not raise an error, but also won't change result
 
         d.unlock_data("dict")
         d["dict", "b"] = 5
