@@ -2,11 +2,10 @@
 
 import logging
 import os
-from collections.abc import Iterable
 from copy import deepcopy
 from functools import wraps
 from pathlib import Path
-from typing import Any, Dict, Literal, Optional, Set, TypeVar, Union, overload
+from typing import Any, Dict, Iterable, Literal, Optional, Set, TypeVar, Union, overload
 
 from ..errors import ReadOnlyKeyError
 from ..types import DICT_OR_LIST_LIKE
@@ -759,9 +758,7 @@ class DH5:
         mode = (
             "r"
             if self._read_only is True
-            else "w"
-            if self._read_only is False
-            else "rw"
+            else "w" if self._read_only is False else "rw"
         )
         mode = "l" if self._filepath is None and self._read_only is not True else mode
         not_saved = "" if mode == "l" else not_saved
