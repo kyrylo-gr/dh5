@@ -541,7 +541,13 @@ class DH5:
 
         """
         if isinstance(__key, tuple):
-            return self.__getitem__(__key[0]).__getitem__(__key[1:] if len(__key) > 2 else __key[1])
+            if len(__key) > 1:
+                return self.__getitem__(__key[0]).__getitem__(
+                    __key[1:] if len(__key) > 2 else __key[1]
+                )
+            if len(__key) == 1:
+                return self.__getitem__(__key[0])
+            raise ValueError("Key should be a string or tuple with at least one element")
         return self.__get_data_or_raise__(__key)
 
     @editing
@@ -556,11 +562,14 @@ class DH5:
 
         """
         if isinstance(__key, tuple):
+            if not __key or len(__key) == 1 or len(__key) == 0:
+                raise ValueError("Key should be a string or tuple with at least two elements")
+
             self.__add_key(__key[0])
             if self.__check_read_only_true(__key[0]):
                 raise ReadOnlyKeyError(__key[0], action="set")
             return self.__getitem__(__key[0]).__setitem__(
-                __key[1:] if len(__key) > 2 else __key[1], __value
+                __key[1:] if len(__key) > 2 else __key[1], __value  # type: ignore
             )
 
         if self.__check_read_only_true(__key):
