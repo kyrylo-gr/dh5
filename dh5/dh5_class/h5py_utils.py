@@ -112,6 +112,8 @@ def save_sub_dict(
     data: Union[dict, list, np.ndarray, ClassWithAsdict],
     key: str,
     use_compression: Optional[Union[Literal[True], str]] = None,
+    json_conversion_mode: str = "auto",
+    storage_type: Optional[dict] = None,
 ):
     """Save the dict to a group. Each object is converted to a dict, array or simple value.
 
@@ -132,9 +134,27 @@ def save_sub_dict(
     if isinstance(data, dict):
         g = group.create_group(key)
         for k, v in data.items():
-            save_sub_dict(g, v, k, use_compression=use_compression)
+            save_sub_dict(
+                g,
+                v,
+                k,
+                use_compression=use_compression,
+                json_conversion_mode=json_conversion_mode,
+                storage_type=storage_type,
+            )
     elif (key is not None) and (data is not None):
-        data = transform_not_dict_on_save(data)  # type: ignore
+        data = transform_not_dict_on_save(  # type: ignore
+            data, json_conversion_mode=json_conversion_mode, key=key
+        )
+        if storage_type is not None:
+            if isinstance(data, str) and data.startswith("__json__"):
+                storage_type[key] = "JSON string"
+            elif isinstance(data, str) and data.startswith("__function__"):
+                storage_type[key] = "serialized function"
+            elif isinstance(data, (list, np.ndarray)):
+                storage_type[key] = "H5 dataset"
+            else:
+                storage_type[key] = type(data).__name__
         if isinstance(data, (np.ndarray, list)):
             use_compression = "gzip" if use_compression is True else use_compression
             group.create_dataset(
@@ -149,7 +169,9 @@ def save_dict(
     data: dict,
     key_prefix: Optional[str] = None,
     use_compression: Optional[Union[Literal[True], str]] = None,
-) -> float:
+    json_conversion_mode: str = "auto",
+    storage_type: Optional[dict] = None,
+) -> int:
     """Save dict to h5 file.
 
     Args:
@@ -160,9 +182,12 @@ def save_dict(
         use_compression (str|True, optional): If compression should be used. If true,
          'gzip' is used, otherwise you can specify compression by providing a str.
          Defaults to not compressed.
+        json_conversion_mode (str, optional): Warning mode for list->JSON conversions.
+         Available values are `all`, `auto`, `mute`. Defaults to `auto`.
+        storage_type (dict, optional): Mutable dictionary filled with key->saved-type metadata.
 
     Returns:
-        float: Time of the last modification of the file.
+        int: Nanosecond-resolution time of the last file modification.
 
     Example:
         ```
@@ -184,8 +209,15 @@ def save_dict(
                 file.pop(key)
             if value is None:
                 continue
-            save_sub_dict(file, value, key, use_compression=use_compression)
-    return os.path.getmtime(filename)
+            save_sub_dict(
+                file,
+                value,
+                key,
+                use_compression=use_compression,
+                json_conversion_mode=json_conversion_mode,
+                storage_type=storage_type,
+            )
+    return os.stat(filename).st_mtime_ns
 
 
 # -------------- Load keys ----------------

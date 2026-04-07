@@ -80,7 +80,9 @@ class DH5:
     _raise_file_locked_error: bool = False
     _retry_on_file_locked_error: int = 5
     _last_time_data_checked: float = 0
-    _file_modified_time: float = 0
+    _file_modified_time: int = 0
+    _file_size: int = 0
+    _saved_storage_type: Dict[str, str]
     __should_initialized: bool = False
     __should_not_be_converted__ = True
 
@@ -96,6 +98,7 @@ class DH5:
         overwrite: Optional[bool] = None,
         data: Optional[dict] = None,
         open_on_init: Optional[bool] = None,
+        json_conversion_mode: Literal["all", "auto", "mute"] = "auto",
         **kwds,
     ):
         """DH5.
@@ -113,6 +116,9 @@ class DH5:
             data (Optional[dict], optional):
                 Data to load. If data provided, file . Defaults to None.
             open_on_init (Optional[bool], optional): open_on_init. Defaults to True.
+            json_conversion_mode (Literal["all", "auto", "mute"], optional):
+                Warning mode for list-to-JSON conversion during save.
+                Defaults to "auto".
 
         """
         if mode is not None:
@@ -142,7 +148,15 @@ class DH5:
         self._keys: Set[str] = set(self._data.keys())
         self._last_update = set()
         self._save_on_edit = save_on_edit
+        self._json_conversion_mode: Literal["all", "auto", "mute"] = (
+            json_conversion_mode
+        )
+        if self._json_conversion_mode not in {"all", "auto", "mute"}:
+            raise ValueError(
+                "json_conversion_mode should be one of: 'all', 'auto', 'mute'"
+            )
         self._classes_should_be_saved_internally = set()
+        self._saved_storage_type = {}
         self._key_prefix: Optional[str] = kwds.get("key_prefix")
 
         if read_only is None:
@@ -256,7 +270,9 @@ class DH5:
             raise ValueError("Filepath is not specified. So cannot load_h5")
         filepath = filepath if filepath.endswith(".h5") else filepath + ".h5"
         data = h5py_utils.open_h5(filepath, key=key, key_prefix=self._key_prefix)
-        self._file_modified_time = os.path.getmtime(filepath)
+        stat = os.stat(filepath)
+        self._file_modified_time = stat.st_mtime_ns
+        self._file_size = stat.st_size
         return self._update(data)
 
     def load(
@@ -356,10 +372,14 @@ class DH5:
         self._pre_save()
         self._keys.add(key)
         self._last_update.add(key)
+        if key in self._saved_storage_type:
+            self._saved_storage_type.pop(key)
 
     def __del_key(self, key):
         self._keys.remove(key)
         self._last_update.add(key)
+        if key in self._saved_storage_type:
+            self._saved_storage_type.pop(key)
 
     def __check_read_only_true(self, key):
         """Return true if data with this key is only available for read.
@@ -738,13 +758,15 @@ class DH5:
 
     def _get_repr(self):
         if self._repr is None:
-            additional_info = (
-                {key: " (r)" for key in self._read_only}
-                if isinstance(self._read_only, set)
-                else None
-            )
+            additional_info: Dict[str, str] = {}
+            if isinstance(self._read_only, set):
+                additional_info = {key: " (r)" for key in self._read_only}
+            for key, storage_type in self._saved_storage_type.items():
+                postfix = f" [saved as {storage_type}]"
+                additional_info[key] = additional_info.get(key, "") + postfix
             self._repr = output_dict_structure(
-                self._data, additional_info=additional_info
+                self._data,
+                additional_info=additional_info if additional_info else None,
             ) + (
                 f"\nUnloaded keys: {self._unopened_keys}" if self._unopened_keys else ""
             )
@@ -886,9 +908,29 @@ class DH5:
         for i in range(self._retry_on_file_locked_error):
             try:
                 # print("_raise_file_locked_error", self._raise_file_locked_error, list(data.keys()))
+                storage_type = {}
                 self._file_modified_time = h5py_utils.save_dict(
-                    filename=filepath + ".h5", data=data, key_prefix=self._key_prefix
+                    filename=filepath + ".h5",
+                    data=data,
+                    key_prefix=self._key_prefix,
+                    json_conversion_mode=self._json_conversion_mode,
+                    storage_type=storage_type,
                 )
+                for key, value in data.items():
+                    if value is None:
+                        self._saved_storage_type.pop(key, None)
+                        continue
+                    if isinstance(value, dict):
+                        self._saved_storage_type.pop(key, None)
+                        continue
+                    saved_key = (
+                        f"{self._key_prefix}/{key}" if self._key_prefix else key
+                    )
+                    if saved_key in storage_type:
+                        self._saved_storage_type[key] = storage_type[saved_key]
+                stat = os.stat(filepath + ".h5")
+                self._file_modified_time = stat.st_mtime_ns
+                self._file_size = stat.st_size
                 return
             except h5py_utils.FileLockedError as error:
                 if self._raise_file_locked_error:
@@ -967,8 +1009,10 @@ class DH5:
         """
         if self.filepath is None:
             raise ValueError("Cannot pull from file if it's not been set")
-        file_modified = os.path.getmtime(self.filepath + ".h5")
-        return self._file_modified_time != file_modified
+        stat = os.stat(self.filepath + ".h5")
+        return (self._file_modified_time != stat.st_mtime_ns) or (
+            self._file_size != stat.st_size
+        )
 
     def pull(self, force_pull: bool = False):
         """Pull data from a file and reloads it into the object.
