@@ -1,11 +1,14 @@
 """Data transformation utils."""
 
 import json
-from typing import Iterable, Optional, Sized
+import logging
+from typing import Iterable, List, Literal, Optional, Sized, Tuple
 
 import numpy as np
 
 from ..types import DICT_OR_LIST_LIKE
+
+_JSON_WARN_AUTO_THRESHOLD = 1000  # estimated JSON bytes before auto-warning fires
 
 
 def np_array_check(lst, size: Optional[int] = None) -> int:
@@ -114,3 +117,72 @@ def transform_not_dict_on_save(value, level=0):
         return "__function__" + function_save.function_to_str(value)
 
     return value
+
+
+def get_storage_type(value) -> str:
+    """Return how *value* will be stored in the HDF5 file.
+
+    Returns one of: ``"array"``, ``"json"``, ``"function"``, ``"group"``, ``"scalar"``.
+    """
+    if isinstance(value, np.ndarray):
+        return "array"
+    if isinstance(value, list):
+        return "json" if np_array_check(value) < 0 else "array"
+    if callable(value):
+        return "function"
+    if isinstance(value, dict):
+        return "group"
+    return "scalar"
+
+
+def _estimate_json_size(value) -> int:
+    """Rough estimate of how many bytes the JSON-encoded form of *value* would take."""
+    try:
+        return len(json.dumps(value))
+    except (TypeError, ValueError):
+        return 0
+
+
+def find_json_conversions(
+    data: dict, prefix: str = ""
+) -> List[Tuple[str, int]]:
+    """Walk *data* recursively and return (key_path, estimated_bytes) for every
+    value that will be JSON-encoded when saved to HDF5.
+    """
+    results: List[Tuple[str, int]] = []
+    for key, value in data.items():
+        path = f"{prefix}{key}"
+        if isinstance(value, dict):
+            results.extend(find_json_conversions(value, prefix=path + "/"))
+        elif isinstance(value, list) and np_array_check(value) < 0:
+            results.append((path, _estimate_json_size(value)))
+        elif callable(value):
+            results.append((path, 0))
+    return results
+
+
+def warn_json_conversions(
+    data: dict,
+    mode: Literal["all", "auto", "mute"] = "auto",
+) -> None:
+    """Issue warnings for values in *data* that will be JSON-encoded on save.
+
+    Args:
+        data: The dictionary of values to inspect.
+        mode: Warning verbosity.
+            ``"all"``  – warn for every JSON-converted value.
+            ``"auto"`` – warn only when the estimated payload exceeds
+                         ``_JSON_WARN_AUTO_THRESHOLD`` bytes.
+            ``"mute"`` – never warn.
+    """
+    if mode == "mute":
+        return
+    for key_path, size in find_json_conversions(data):
+        if mode == "all" or (mode == "auto" and size >= _JSON_WARN_AUTO_THRESHOLD):
+            logging.warning(
+                "DH5: key '%s' will be stored as a JSON string in the HDF5 file "
+                "(estimated size: %d bytes). Consider using a numpy array for "
+                "better performance.",
+                key_path,
+                size,
+            )

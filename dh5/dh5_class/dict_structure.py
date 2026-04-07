@@ -5,6 +5,8 @@ from typing import Dict, Optional
 
 import numpy as np
 
+from .data_transformation import get_storage_type
+
 
 def output_dict_structure(
     data: dict, additional_info: Optional[Dict[str, str]] = None
@@ -24,7 +26,7 @@ def output_dict_structure(
     dict_str = dict_to_json_format_str(get_dict_structure(data))
     if additional_info:
         for key, value in additional_info.items():
-            dict_str = dict_str.replace(f'"{key}":', f'"{key}"{value}:')
+            dict_str = dict_str.replace(f'"{ key}":', f'"{ key}"{value}:')
     return dict_str
 
 
@@ -68,7 +70,14 @@ def get_dict_structure(data: dict, level: int = 3) -> dict:
                 structure[k] = "variable of type dict"
 
         elif isinstance(v, (np.ndarray, list)):
-            structure[k] = f"shape: {np.shape(v)} (type: {type(v).__name__})"
+            storage = get_storage_type(v)
+            base = f"shape: {np.shape(v)} (type: {type(v).__name__})"
+            if storage == "json":
+                structure[k] = base + " [stored as: json]"
+            else:
+                structure[k] = base
+        elif callable(v):
+            structure[k] = f"variable of type {type(v).__name__} [stored as: function]"
         elif isinstance(v, (int, np.int_)):  # type: ignore
             structure[k] = f"{v:.0f} (type : {type(v).__name__})"
         elif isinstance(v, (float, np.floating, complex, np.complex128)):  # type: ignore
