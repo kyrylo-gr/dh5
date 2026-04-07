@@ -2,7 +2,7 @@
 
 import json
 import logging
-from typing import Iterable, List, Literal, Optional, Sized, Tuple
+from typing import Dict, Iterable, List, Literal, Optional, Sized, Tuple
 
 import numpy as np
 
@@ -144,19 +144,30 @@ def _estimate_json_size(value) -> int:
 
 
 def find_json_conversions(
-    data: dict, prefix: str = ""
+    data: dict,
+    prefix: str = "",
+    storage_type_cache: Optional[Dict[str, str]] = None,
 ) -> List[Tuple[str, int]]:
     """Walk *data* recursively and return (key_path, estimated_bytes) for every
     value that will be JSON-encoded when saved to HDF5.
+
+    Args:
+        data: Dictionary to inspect.
+        prefix: Key-path prefix used during recursion (leave empty for the top level).
+        storage_type_cache: Pre-computed storage types for the *top-level* keys of *data*
+            (i.e. only used when ``prefix`` is empty). Avoids calling ``np_array_check``
+            on already-classified values.
     """
     results: List[Tuple[str, int]] = []
     for key, value in data.items():
         path = f"{prefix}{key}"
+        # Use the pre-computed type only for top-level keys (prefix is empty).
+        cached = storage_type_cache.get(key) if (storage_type_cache is not None and not prefix) else None
         if isinstance(value, dict):
             results.extend(find_json_conversions(value, prefix=path + "/"))
-        elif isinstance(value, list) and np_array_check(value) < 0:
+        elif cached == "json" or (cached is None and isinstance(value, list) and np_array_check(value) < 0):
             results.append((path, _estimate_json_size(value)))
-        elif callable(value):
+        elif cached == "function" or (cached is None and callable(value)):
             results.append((path, 0))
     return results
 
@@ -164,20 +175,23 @@ def find_json_conversions(
 def warn_json_conversions(
     data: dict,
     mode: Literal["all", "auto", "mute"] = "auto",
+    storage_type_cache: Optional[Dict[str, str]] = None,
 ) -> None:
     """Issue warnings for values in *data* that will be JSON-encoded on save.
 
     Args:
         data: The dictionary of values to inspect.
         mode: Warning verbosity.
-            ``"all"``  – warn for every JSON-converted value.
-            ``"auto"`` – warn only when the estimated payload exceeds
+            ``"all"``  \u2013 warn for every JSON-converted value.
+            ``"auto"`` \u2013 warn only when the estimated payload exceeds
                          ``_JSON_WARN_AUTO_THRESHOLD`` bytes.
-            ``"mute"`` – never warn.
+            ``"mute"`` \u2013 never warn.
+        storage_type_cache: Pre-computed storage types (from ``DH5._storage_types``).
+            Passed through to ``find_json_conversions`` to avoid redundant computation.
     """
     if mode == "mute":
         return
-    for key_path, size in find_json_conversions(data):
+    for key_path, size in find_json_conversions(data, storage_type_cache=storage_type_cache):
         if mode == "all" or (mode == "auto" and size >= _JSON_WARN_AUTO_THRESHOLD):
             logging.warning(
                 "DH5: key '%s' will be stored as a JSON string in the HDF5 file "

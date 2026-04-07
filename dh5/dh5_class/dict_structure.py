@@ -9,7 +9,9 @@ from .data_transformation import get_storage_type
 
 
 def output_dict_structure(
-    data: dict, additional_info: Optional[Dict[str, str]] = None
+    data: dict,
+    additional_info: Optional[Dict[str, str]] = None,
+    storage_type_cache: Optional[Dict[str, str]] = None,
 ) -> str:
     """Convert a dictionary into a JSON-like string representation of its structure.
 
@@ -19,14 +21,16 @@ def output_dict_structure(
             Each key-value pair in the additional_info dictionary will be appended to the corresponding key in the
             string representation. The key will be enclosed in double quotes and the value will be appended without
             quotes.
+        storage_type_cache (Optional[Dict[str, str]]): Pre-computed storage types keyed by top-level key,
+            as returned by ``get_storage_type``. When provided, avoids recomputing storage types.
 
     Returns:
         str: The JSON-like string representation of the dictionary structure.
     """
-    dict_str = dict_to_json_format_str(get_dict_structure(data))
+    dict_str = dict_to_json_format_str(get_dict_structure(data, storage_type_cache=storage_type_cache))
     if additional_info:
         for key, value in additional_info.items():
-            dict_str = dict_str.replace(f'"{ key}":', f'"{ key}"{value}:')
+            dict_str = dict_str.replace(f'"{ key}":', f'"{key}"{value}:')
     return dict_str
 
 
@@ -42,13 +46,20 @@ def dict_to_json_format_str(data: dict) -> str:
     return json.dumps(data, sort_keys=True, indent=4)
 
 
-def get_dict_structure(data: dict, level: int = 3) -> dict:
+def get_dict_structure(
+    data: dict,
+    level: int = 3,
+    storage_type_cache: Optional[Dict[str, str]] = None,
+) -> dict:
     """Recursively analyzes the structure of a dictionary.
     Returns a dictionary containing information about the types and shapes of the values.
 
     Args:
         data (dict): The dictionary to analyze.
         level (int, optional): The maximum depth to analyze the dictionary. Defaults to 3.
+        storage_type_cache (Optional[Dict[str, str]]): Pre-computed storage types for the
+            top-level keys of *data*. Used to avoid recomputing ``get_storage_type`` on
+            every repr call; not passed to recursive calls (nested-dict keys are not cached).
 
     Returns:
         dict: A dictionary containing information about the structure of the input dictionary.
@@ -70,7 +81,11 @@ def get_dict_structure(data: dict, level: int = 3) -> dict:
                 structure[k] = "variable of type dict"
 
         elif isinstance(v, (np.ndarray, list)):
-            storage = get_storage_type(v)
+            storage = (
+                storage_type_cache[k]
+                if storage_type_cache is not None and k in storage_type_cache
+                else get_storage_type(v)
+            )
             base = f"shape: {np.shape(v)} (type: {type(v).__name__})"
             if storage == "json":
                 structure[k] = base + " [stored as: json]"
