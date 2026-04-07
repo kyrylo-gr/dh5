@@ -7,7 +7,8 @@ import numpy as np
 
 
 def output_dict_structure(
-    data: dict, additional_info: Optional[Dict[str, str]] = None
+    data: dict,
+    additional_info: Optional[Dict[str, str]] = None,
 ) -> str:
     """Convert a dictionary into a JSON-like string representation of its structure.
 
@@ -57,7 +58,9 @@ def get_dict_structure(data: dict, level: int = 3) -> dict:
         if isinstance(v, dict):
             if level:
                 internal_structure = (
-                    get_dict_structure(v, level=level - 1) if len(v) else "empty dict"
+                    get_dict_structure(v, level=level - 1)
+                    if len(v)
+                    else "empty dict"
                 )
                 structure[k] = (
                     "variable of type dict"
@@ -76,6 +79,7 @@ def get_dict_structure(data: dict, level: int = 3) -> dict:
             structure[k] = f"{str_value} (type : {type(v).__name__})"
         else:
             structure[k] = f"variable of type {type(v).__name__}"
+
     return structure
 
 

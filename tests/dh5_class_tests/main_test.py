@@ -8,7 +8,9 @@ everything is good.
 
 import os
 import shutil
+import tempfile
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
@@ -248,11 +250,49 @@ class WithoutSavingTest(unittest.TestCase):
         self.data_smart["ab3"] = 123.45
         self.data_smart["ab4"] = {"a": 567, "b": {"c": {"d": {"e": {"f": "g"}}}}}
         self.data_smart["ab5"] = Test()
+        self.data_smart["ab6"] = [1, "a", {"b": 2}]
         rep = repr(self.data_smart)
-        for key in ["ab1", "ab2", "ab3", "ab4", "ab5"]:
+        for key in ["ab1", "ab2", "ab3", "ab4", "ab5", "ab6"]:
             self.assertIn(key, rep)
 
         self.assertIn("Test", rep)
+
+    def test_repr_contains_saved_type_after_save(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            filepath = os.path.join(tmp_dir, "repr_saved_type")
+            d = DH5(filepath, overwrite=True, save_on_edit=True, json_conversion_mode="mute")
+            d["mixed"] = [1, "a", {"b": 2}]
+            d["nested"] = {"a": 1}
+            rep = repr(d)
+            self.assertIn("[saved as JSON string]", rep)
+            self.assertNotIn('"nested" [saved as', rep)
+
+    def test_json_conversion_warning_modes(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            filepath = os.path.join(tmp_dir, "warning_mode_test")
+
+            with self.assertLogs(level="WARNING") as all_logs:
+                d_all = DH5(
+                    filepath,
+                    overwrite=True,
+                    save_on_edit=True,
+                    json_conversion_mode="all",
+                )
+                d_all["mixed"] = [1, "a", {"b": 2}]
+            self.assertIn("converted value", " ".join(all_logs.output))
+
+            with self.assertRaises(ValueError):
+                DH5(filepath, overwrite=True, json_conversion_mode="invalid")  # type: ignore
+
+            with patch("dh5.dh5_class.data_transformation.logging.warning") as log_mock:
+                d_mute = DH5(
+                    filepath,
+                    overwrite=True,
+                    save_on_edit=True,
+                    json_conversion_mode="mute",
+                )
+                d_mute["mixed"] = [1, "a", {"b": 2}]
+            log_mock.assert_not_called()
 
     def test_keys_tree(self):
         data = self.create_random_data()

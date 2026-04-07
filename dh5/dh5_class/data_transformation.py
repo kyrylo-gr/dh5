@@ -1,6 +1,7 @@
 """Data transformation utils."""
 
 import json
+import logging
 from typing import Iterable, Optional, Sized
 
 import numpy as np
@@ -90,7 +91,27 @@ def transform_on_open(value):
     return value
 
 
-def transform_not_dict_on_save(value, level=0):
+def _warn_json_conversion_if_needed(
+    value_to_dump, converted_payload: str, mode: str, *, key: Optional[str] = None
+):
+    if mode == "mute":
+        return
+    if mode not in {"all", "auto"}:
+        raise ValueError("json_conversion_mode should be one of: 'all', 'auto', 'mute'")
+    if mode == "auto" and len(converted_payload) < 1024:
+        return
+    key_info = f" for key '{key}'" if key else ""
+    logging.warning(
+        "DH5 converted value%s to JSON string before saving (type=%s, approx_size=%dB).",
+        key_info,
+        type(value_to_dump).__name__,
+        len(converted_payload),
+    )
+
+
+def transform_not_dict_on_save(
+    value, level=0, *, json_conversion_mode: str = "auto", key: Optional[str] = None
+):
     """Transform data during saving of h5 file if data is not a dict."""
     if isinstance(value, np.ndarray):
         if level == 0:
@@ -100,13 +121,24 @@ def transform_not_dict_on_save(value, level=0):
     if isinstance(value, (list)) and (np_array_check(value) < 0):
         try:
             if level == 0:
-                return "__json__" + json.dumps(value)
+                converted = json.dumps(value)
+                _warn_json_conversion_if_needed(
+                    value, converted, json_conversion_mode, key=key
+                )
+                return "__json__" + converted
             return value
         except TypeError:
             value_transformed = [
-                transform_not_dict_on_save(v, level=level + 1) for v in value
+                transform_not_dict_on_save(
+                    v, level=level + 1, json_conversion_mode="mute", key=key
+                )
+                for v in value
             ]
-            return "__json__" + json.dumps(value_transformed)
+            converted = json.dumps(value_transformed)
+            _warn_json_conversion_if_needed(
+                value, converted, json_conversion_mode, key=key
+            )
+            return "__json__" + converted
 
     if callable(value):
         from .transformation_types import function_save
