@@ -10,7 +10,7 @@ from typing import Any, Dict, Iterable, Literal, Optional, Set, TypeVar, Union, 
 from ..errors import ReadOnlyKeyError
 from ..types import DICT_OR_LIST_LIKE
 from . import h5py_utils
-from .data_transformation import transform_to_possible_formats
+from .data_transformation import transform_to_possible_formats, warn_json_conversions
 from .dict_structure import get_keys_structure, output_dict_structure
 from .internal_classes import NotLoaded
 
@@ -83,6 +83,23 @@ class DH5:
     _file_modified_time: float = 0
     __should_initialized: bool = False
     __should_not_be_converted__ = True
+    _json_warn_mode: Literal["all", "auto", "mute"] = "auto"
+
+    @property
+    def json_warn_mode(self) -> Literal["all", "auto", "mute"]:
+        """Warning mode for JSON-encoded values on save.
+
+        ``"all"``  – warn on every JSON conversion.
+        ``"auto"`` – warn only when the estimated payload is large (default).
+        ``"mute"`` – never warn.
+        """
+        return self._json_warn_mode
+
+    @json_warn_mode.setter
+    def json_warn_mode(self, value: Literal["all", "auto", "mute"]) -> None:
+        if value not in ("all", "auto", "mute"):
+            raise ValueError(f"json_warn_mode must be 'all', 'auto', or 'mute', got {value!r}")
+        object.__setattr__(self, "_json_warn_mode", value)
 
     def __init__(
         self,
@@ -96,6 +113,7 @@ class DH5:
         overwrite: Optional[bool] = None,
         data: Optional[dict] = None,
         open_on_init: Optional[bool] = None,
+        json_warn_mode: Optional[Literal["all", "auto", "mute"]] = None,
         **kwds,
     ):
         """DH5.
@@ -113,6 +131,10 @@ class DH5:
             data (Optional[dict], optional):
                 Data to load. If data provided, file . Defaults to None.
             open_on_init (Optional[bool], optional): open_on_init. Defaults to True.
+            json_warn_mode (str, optional): Warning verbosity for values that will be
+                JSON-encoded when saved. ``"all"`` warns on every conversion,
+                ``"auto"`` (default) warns only for large payloads, ``"mute"`` silences
+                all warnings. Can also be changed later via ``instance.json_warn_mode``.
 
         """
         if mode is not None:
@@ -143,6 +165,8 @@ class DH5:
         self._last_update = set()
         self._save_on_edit = save_on_edit
         self._classes_should_be_saved_internally = set()
+        if json_warn_mode is not None:
+            self.json_warn_mode = json_warn_mode
         self._key_prefix: Optional[str] = kwds.get("key_prefix")
 
         if read_only is None:
@@ -824,6 +848,8 @@ class DH5:
             raise ValueError(
                 "Cannot save opened in a read-only mode. Should reopen the file"
             )
+
+        warn_json_conversions(self._data, mode=self.json_warn_mode)
 
         self._pre_save()
 
